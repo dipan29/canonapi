@@ -40,7 +40,7 @@ namespace canonapi.Controllers
             {
                 var authClaims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Name, userObj.firstname),
+                    new Claim(ClaimTypes.Name, userObj.username),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 };
 

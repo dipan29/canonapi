@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -33,13 +34,99 @@ namespace canonapi.Controllers
         [ActionName("GetImageCount")]
         public IActionResult GetImageCount()
         {
+            UserWisePredictionCounts counts = new UserWisePredictionCounts();
             try
             {
-                var totalImages = _dbContext.Images.Count();
+                var claimsIdentity = this.User.Identity as ClaimsIdentity;
+                var username = claimsIdentity.FindFirst(ClaimTypes.Name)?.Value;
+                User userObj = _dbContext.Users.SingleOrDefault(u => u.username == username);
+
+                if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.Yes)
+                {
+                    counts.totalImagesPredicted = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
+                    && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.Yes.GetHashCode()).Count();
+
+                    counts.totalDR0FromPredicted = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
+                    && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.Yes.GetHashCode()
+                    && u.drlevel_byuser == DRStatus.DR0.GetHashCode()).Count();
+
+                    counts.totalDR1FromPredicted = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
+                    && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.Yes.GetHashCode()
+                    && u.drlevel_byuser == DRStatus.DR1.GetHashCode()).Count();
+
+                    counts.totalDR2FromPredicted = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
+                    && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.Yes.GetHashCode()
+                    && u.drlevel_byuser == DRStatus.DR2.GetHashCode()).Count();
+
+                    counts.totalDR3FromPredicted = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
+                    && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.Yes.GetHashCode()
+                    && u.drlevel_byuser == DRStatus.DR3.GetHashCode()).Count();
+
+                    counts.totalDR4FromPredicted = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
+                    && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.Yes.GetHashCode()
+                    && u.drlevel_byuser == DRStatus.DR4.GetHashCode()).Count();
+
+                    counts.totalImages = _dbContext.Images.Where(i => i.drlevel_kaggle == i.drlevel_sushrut).Count();
+                }
+                else if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.No)
+                {
+                    counts.totalImagesPredicted = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
+                    && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.No.GetHashCode()).Count();
+
+                    counts.totalDR0FromPredicted = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
+                    && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.No.GetHashCode()
+                    && u.drlevel_byuser == DRStatus.DR0.GetHashCode()).Count();
+
+                    counts.totalDR1FromPredicted = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
+                    && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.No.GetHashCode()
+                    && u.drlevel_byuser == DRStatus.DR1.GetHashCode()).Count();
+
+                    counts.totalDR2FromPredicted = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
+                    && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.No.GetHashCode()
+                    && u.drlevel_byuser == DRStatus.DR2.GetHashCode()).Count();
+
+                    counts.totalDR3FromPredicted = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
+                    && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.No.GetHashCode()
+                    && u.drlevel_byuser == DRStatus.DR3.GetHashCode()).Count();
+
+                    counts.totalDR4FromPredicted = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
+                    && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.No.GetHashCode()
+                    && u.drlevel_byuser == DRStatus.DR4.GetHashCode()).Count();
+
+                    counts.totalImages = _dbContext.Images.Where(i => i.drlevel_kaggle != i.drlevel_sushrut).Count();
+                }
+                else
+                {
+                    counts.totalImagesPredicted = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
+                    && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.All.GetHashCode()).Count();
+
+                    counts.totalDR0FromPredicted = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
+                    && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.All.GetHashCode()
+                    && u.drlevel_byuser == DRStatus.DR0.GetHashCode()).Count();
+
+                    counts.totalDR1FromPredicted = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
+                    && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.All.GetHashCode()
+                    && u.drlevel_byuser == DRStatus.DR1.GetHashCode()).Count();
+
+                    counts.totalDR2FromPredicted = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
+                    && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.All.GetHashCode()
+                    && u.drlevel_byuser == DRStatus.DR2.GetHashCode()).Count();
+
+                    counts.totalDR3FromPredicted = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
+                    && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.All.GetHashCode()
+                    && u.drlevel_byuser == DRStatus.DR3.GetHashCode()).Count();
+
+                    counts.totalDR4FromPredicted = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
+                    && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.All.GetHashCode()
+                    && u.drlevel_byuser == DRStatus.DR4.GetHashCode()).Count();
+
+                    counts.totalImages = _dbContext.Images.Count();
+                }
+
                 return Ok(new
                 {
                     success = 1,
-                    data = totalImages
+                    data = counts
                 });
             }
             catch (Exception ex)
@@ -54,7 +141,7 @@ namespace canonapi.Controllers
 
         [HttpGet]
         [ActionName("GetPaginated")]
-        public IActionResult GetPaginated([FromQuery] int page, [FromQuery] int limit)
+        public IActionResult GetPaginated([FromQuery] int page, [FromQuery] int limit, [FromQuery] DRStatus dr = DRStatus.All)
         {
             List<ImageOut> lstImages = new List<ImageOut>();
             try
@@ -65,19 +152,122 @@ namespace canonapi.Controllers
                 if (limit == 0)
                     limit = int.MaxValue;
 
-                var skip = (page - 1) * limit;
+                var claimsIdentity = this.User.Identity as ClaimsIdentity;
+                var username = claimsIdentity.FindFirst(ClaimTypes.Name)?.Value;
+                User userObj = _dbContext.Users.SingleOrDefault(u => u.username == username);
 
-                var savedSearches = _dbContext.Images.Skip(skip).Take(limit);
-                savedSearches.ToList().ForEach(i =>
+                var skip = (page - 1) * limit;
+                IEnumerable<Image> savedSearches = null;
+                IEnumerable<ImageDrByUser> userGradedImages = null;
+                if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.Yes)
+                {
+                    if (dr == DRStatus.All)
+                    {
+                        userGradedImages = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
+                        && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.Yes.GetHashCode());
+
+                        if (userGradedImages != null && userGradedImages.Count() > default(int))
+                        {
+                            var totRec = _dbContext.Images.Where(i => i.drlevel_kaggle == i.drlevel_sushrut).ToList();
+                            var ugradedImg = userGradedImages.ToList();
+                            savedSearches = (from x in totRec where !ugradedImg.Any(y => y.imagename == x.imagename) select x).ToList().Skip(skip).Take(limit);
+                        }
+                        else
+                        {
+                            savedSearches = _dbContext.Images.Where(i => i.drlevel_kaggle == i.drlevel_sushrut).Skip(skip).Take(limit);
+                        }
+                    }
+                    else
+                    {
+                        userGradedImages = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
+                        && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.Yes.GetHashCode()
+                        && u.drlevel_byuser == dr.GetHashCode());
+                    }
+                }
+                else if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.No)
+                {
+                    if (dr == DRStatus.All)
+                    {
+                        userGradedImages = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
+                        && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.No.GetHashCode());
+
+                        if (userGradedImages != null && userGradedImages.Count() > default(int))
+                        {
+                            var totRec = _dbContext.Images.Where(i => i.drlevel_kaggle == i.drlevel_sushrut).ToList();
+                            var ugradedImg = userGradedImages.ToList();
+                            savedSearches = (from x in totRec where !ugradedImg.Any(y => y.imagename != x.imagename) select x).ToList().Skip(skip).Take(limit);
+                        }
+                        else
+                        {
+                            savedSearches = _dbContext.Images.Where(i => i.drlevel_kaggle != i.drlevel_sushrut).Skip(skip).Take(limit);
+                        }
+                    }
+                    else
+                    {
+                        userGradedImages = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
+                        && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.No.GetHashCode()
+                        && u.drlevel_byuser == dr.GetHashCode());
+                    }
+                }
+                else
+                {
+                    if (dr == DRStatus.All)
+                    {
+                        userGradedImages = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
+                        && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.All.GetHashCode());
+
+                        if (userGradedImages != null && userGradedImages.Count() > default(int))
+                        {
+                            var totRec = _dbContext.Images.ToList();
+                            var ugradedImg = userGradedImages.ToList();
+                            savedSearches = (from x in totRec where !ugradedImg.Any(y => y.imagename == x.imagename) select x).ToList().Skip(skip).Take(limit);
+                        }
+                        else
+                        {
+                            savedSearches = _dbContext.Images.Skip(skip).Take(limit);
+                        }
+                    }
+                    else
+                    {
+                        userGradedImages = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
+                        && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.All.GetHashCode()
+                        && u.drlevel_byuser == dr.GetHashCode());
+                    }
+                }
+
+                List<Image> lst = new List<Image>();
+                if (savedSearches != null && savedSearches.Count() > default(int))
+                {
+                    lst = savedSearches.ToList();
+                }
+                else
+                {
+                    if (userGradedImages != null && userGradedImages.Count() > default(int))
+                    {
+                        userGradedImages.ToList().ForEach(ui =>
+                        {
+                            var img = new Image();
+                            var qryImg = _dbContext.Images.Where(i => i.imagename == ui.imagename).FirstOrDefault();
+                            img.imagename = qryImg.imagename;
+                            img.id = qryImg.id;
+                            img.imageurl = qryImg.imageurl;
+                            img.drlevel_sushrut = qryImg.drlevel_sushrut;
+                            img.drlevel_kaggle = qryImg.drlevel_kaggle;
+                            lst.Add(img);
+                        });
+                    }
+                }
+
+                lst.ForEach(i =>
                 {
                     var imgOutObj = new ImageOut();
                     imgOutObj.id = i.id;
                     imgOutObj.thumbnail = new ImageHandler(_configuration).GetFileFromLocal(i.imagename, true);
-                    imgOutObj.drlevel_kaggle = (DRStatus) i.drlevel_kaggle;
+                    imgOutObj.drlevel_kaggle = (DRStatus)i.drlevel_kaggle;
                     imgOutObj.drlevel_sushrut = (DRStatus)i.drlevel_sushrut;
                     lstImages.Add(imgOutObj);
                 });
-                
+
                 return Ok(new
                 {
                     success = 1,
@@ -101,7 +291,19 @@ namespace canonapi.Controllers
             ImageOut obj = new ImageOut();
             try
             {
-                Image objImage = _dbContext.Images.SingleOrDefault(i => i.id == id);
+                Image objImage;
+                if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.Yes)
+                {
+                    objImage = _dbContext.Images.Where(i => i.drlevel_kaggle == i.drlevel_sushrut).SingleOrDefault(i => i.id == id);
+                }
+                else if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.No)
+                {
+                    objImage = _dbContext.Images.Where(i => i.drlevel_kaggle != i.drlevel_sushrut).SingleOrDefault(i => i.id == id);
+                }
+                else
+                {
+                    objImage = _dbContext.Images.SingleOrDefault(i => i.id == id);
+                }
                 obj.id = objImage.id;
                 obj.drlevel_kaggle = (DRStatus)objImage.drlevel_kaggle;
                 obj.drlevel_sushrut = (DRStatus)objImage.drlevel_sushrut;
@@ -124,14 +326,43 @@ namespace canonapi.Controllers
         }
 
         [HttpPost]
-        [ActionName("UpdateRecord")]
-        public IActionResult UpdateRecord([FromBody] Image obj)
+        [ActionName("UpdateDrRecord")]
+        public IActionResult UpdateDrRecord([FromBody] ImageDrByUser obj)
         {
             try
             {
                 if (obj != null)
                 {
+                    var claimsIdentity = this.User.Identity as ClaimsIdentity;
+                    var username = claimsIdentity.FindFirst(ClaimTypes.Name)?.Value;
+                    User userObj = _dbContext.Users.SingleOrDefault(u => u.username == username);
+                    obj.userid = userObj.id;
+                    obj.kaggle_sushrut_drmatched = Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]);
 
+                    ImageDrByUser imgObj = _dbContext.ImageDrByUsers.Where(i => i.imagename == obj.imagename
+                    && i.userid == obj.userid
+                    && i.kaggle_sushrut_drmatched == obj.kaggle_sushrut_drmatched).FirstOrDefault();
+                    if (imgObj != null)
+                    {
+                        // update
+                        imgObj.modifiedon = DateTime.Now;
+                        //imgObj.kaggle_sushrut_drmatched = obj.kaggle_sushrut_drmatched;
+                        imgObj.drlevel_byuser = obj.drlevel_byuser;
+                        _dbContext.SaveChanges();
+                    }
+                    else
+                    {
+                        // insert
+                        obj.createdon = DateTime.Now;
+                        _dbContext.ImageDrByUsers.Add(obj);
+                        _dbContext.SaveChanges();
+                    }
+
+                    return Ok(new
+                    {
+                        success = 1,
+                        message = string.Format("Prediction has been {0} successfully.", (imgObj != null ? "updated" : "added"))
+                    });
                 }
                 else
                 {
@@ -141,7 +372,6 @@ namespace canonapi.Controllers
                         message = "No data has been supplied."
                     });
                 }
-                return null;
             }
             catch (Exception ex)
             {
