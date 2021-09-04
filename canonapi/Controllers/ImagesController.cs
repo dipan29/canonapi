@@ -159,17 +159,18 @@ namespace canonapi.Controllers
                 var skip = (page - 1) * limit;
                 IEnumerable<Image> savedSearches = null;
                 IEnumerable<ImageDrByUser> userGradedImages = null;
+                IEnumerable<ImageDrByUser> userGradedImagesConditional = null;
                 if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.Yes)
                 {
                     if (dr == DRStatus.All)
                     {
-                        userGradedImages = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
+                        userGradedImagesConditional = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
                         && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.Yes.GetHashCode());
 
-                        if (userGradedImages != null && userGradedImages.Count() > default(int))
+                        if (userGradedImagesConditional != null && userGradedImagesConditional.Count() > default(int))
                         {
                             var totRec = _dbContext.Images.Where(i => i.drlevel_kaggle == i.drlevel_sushrut).ToList();
-                            var ugradedImg = userGradedImages.ToList();
+                            var ugradedImg = userGradedImagesConditional.ToList();
                             savedSearches = (from x in totRec where !ugradedImg.Any(y => y.imagename == x.imagename) select x).ToList().Skip(skip).Take(limit);
                         }
                         else
@@ -188,13 +189,13 @@ namespace canonapi.Controllers
                 {
                     if (dr == DRStatus.All)
                     {
-                        userGradedImages = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
+                        userGradedImagesConditional = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
                         && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.No.GetHashCode());
 
-                        if (userGradedImages != null && userGradedImages.Count() > default(int))
+                        if (userGradedImagesConditional != null && userGradedImagesConditional.Count() > default(int))
                         {
                             var totRec = _dbContext.Images.Where(i => i.drlevel_kaggle == i.drlevel_sushrut).ToList();
-                            var ugradedImg = userGradedImages.ToList();
+                            var ugradedImg = userGradedImagesConditional.ToList();
                             savedSearches = (from x in totRec where !ugradedImg.Any(y => y.imagename != x.imagename) select x).ToList().Skip(skip).Take(limit);
                         }
                         else
@@ -213,13 +214,13 @@ namespace canonapi.Controllers
                 {
                     if (dr == DRStatus.All)
                     {
-                        userGradedImages = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
+                        userGradedImagesConditional = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
                         && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.All.GetHashCode());
 
-                        if (userGradedImages != null && userGradedImages.Count() > default(int))
+                        if (userGradedImagesConditional != null && userGradedImagesConditional.Count() > default(int))
                         {
                             var totRec = _dbContext.Images.ToList();
-                            var ugradedImg = userGradedImages.ToList();
+                            var ugradedImg = userGradedImagesConditional.ToList();
                             savedSearches = (from x in totRec where !ugradedImg.Any(y => y.imagename == x.imagename) select x).ToList().Skip(skip).Take(limit);
                         }
                         else
@@ -242,7 +243,7 @@ namespace canonapi.Controllers
                 }
                 else
                 {
-                    if (userGradedImages != null && userGradedImages.Count() > default(int))
+                    if (userGradedImagesConditional == null && userGradedImages != null && userGradedImages.Count() > default(int))
                     {
                         userGradedImages.ToList().ForEach(ui =>
                         {
