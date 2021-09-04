@@ -140,6 +140,48 @@ namespace canonapi.Controllers
         }
 
         [HttpGet]
+        [ActionName("GetImageCountByBucket")]
+        public IActionResult GetImageCountByBucket()
+        {
+            try
+            {
+                /*var claimsIdentity = this.User.Identity as ClaimsIdentity;
+                var username = claimsIdentity.FindFirst(ClaimTypes.Name)?.Value;
+                User userObj = _dbContext.Users.SingleOrDefault(u => u.username == username);*/
+
+                IEnumerable<CountMaster> counts = new List<CountMaster>();
+                if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.Yes)
+                {
+                    counts = _dbContext.ExecuteQuery<CountMaster>(QueryHelper.qryMatchedResultCount);
+                }
+                else if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.No)
+                {
+                    counts = _dbContext.ExecuteQuery<CountMaster>(QueryHelper.qryUnmatchedResultCount);
+                }
+                else if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.All)
+                {
+                    counts = _dbContext.ExecuteQuery<CountMaster>(QueryHelper.qryAllResultCount);
+                }
+                SerializedCountResult result = new SerializedCountResult();
+                result.IsMatchedBucket = (KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]);
+                result.counts = counts;
+                return Ok(new
+                {
+                    success = 1,
+                    data = result
+                });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new
+                {
+                    success = default(int),
+                    message = "Exception has been detected. Please contact to the authority."
+                });
+            }
+        }
+
+        [HttpGet]
         [ActionName("GetPaginated")]
         public IActionResult GetPaginated([FromQuery] int page, [FromQuery] int limit, [FromQuery] DRStatus dr = DRStatus.All)
         {

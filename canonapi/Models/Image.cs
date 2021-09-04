@@ -1,4 +1,6 @@
-﻿namespace canonapi.Models
+﻿using System.Collections.Generic;
+
+namespace canonapi.Models
 {
     public class Image
     {
@@ -37,6 +39,26 @@
         public long totalDR2FromPredicted { get; set; }
         public long totalDR3FromPredicted { get; set; }
         public long totalDR4FromPredicted { get; set; }
+    }
+
+    public class CountMaster
+    {
+        public decimal Kaggle_DR0 { get; set; }
+        public decimal Sushrut_DR0 { get; set; }
+        public decimal Kaggle_DR1 { get; set; }
+        public decimal Sushrut_DR1 { get; set; }
+        public decimal Kaggle_DR2 { get; set; }
+        public decimal Sushrut_DR2 { get; set; }
+        public decimal Kaggle_DR3 { get; set; }
+        public decimal Sushrut_DR3 { get; set; }
+        public decimal Kaggle_DR4 { get; set; }
+        public decimal Sushrut_DR4 { get; set; }
+    }
+
+    public class SerializedCountResult
+    {
+        public KaggleAndSushrutMatchedImages IsMatchedBucket { get; set; }
+        public IEnumerable<CountMaster> counts { get; set; }
     }
 
     public enum DRStatus
