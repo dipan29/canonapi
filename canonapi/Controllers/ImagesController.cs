@@ -266,6 +266,7 @@ namespace canonapi.Controllers
                     imgOutObj.thumbnail = new ImageHandler(_configuration).GetFileFromLocal(i.imagename, true);
                     imgOutObj.drlevel_kaggle = (DRStatus)i.drlevel_kaggle;
                     imgOutObj.drlevel_sushrut = (DRStatus)i.drlevel_sushrut;
+                    imgOutObj.drlevel_byuser = dr;
                     lstImages.Add(imgOutObj);
                 });
 
@@ -292,22 +293,42 @@ namespace canonapi.Controllers
             ImageOut obj = new ImageOut();
             try
             {
+                if (id <= default(long))
+                {
+                    throw new Exception("Parameter not found.");
+                }
+
+                var claimsIdentity = this.User.Identity as ClaimsIdentity;
+                var username = claimsIdentity.FindFirst(ClaimTypes.Name)?.Value;
+                User userObj = _dbContext.Users.SingleOrDefault(u => u.username == username);
+
+                ImageDrByUser userGradedImage = null;
                 Image objImage;
                 if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.Yes)
                 {
                     objImage = _dbContext.Images.Where(i => i.drlevel_kaggle == i.drlevel_sushrut).SingleOrDefault(i => i.id == id);
+
+                    userGradedImage = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id && u.imagename == objImage.imagename
+                    && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.Yes.GetHashCode()).FirstOrDefault();
                 }
                 else if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.No)
                 {
                     objImage = _dbContext.Images.Where(i => i.drlevel_kaggle != i.drlevel_sushrut).SingleOrDefault(i => i.id == id);
+
+                    userGradedImage = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id && u.imagename == objImage.imagename
+                    && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.No.GetHashCode()).FirstOrDefault();
                 }
                 else
                 {
                     objImage = _dbContext.Images.SingleOrDefault(i => i.id == id);
+
+                    userGradedImage = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id && u.imagename == objImage.imagename
+                    && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.All.GetHashCode()).FirstOrDefault();
                 }
                 obj.id = objImage.id;
                 obj.drlevel_kaggle = (DRStatus)objImage.drlevel_kaggle;
                 obj.drlevel_sushrut = (DRStatus)objImage.drlevel_sushrut;
+                obj.drlevel_byuser = userGradedImage != null ? (DRStatus)userGradedImage.drlevel_byuser : DRStatus.All;
                 obj.image = new ImageHandler(_configuration).GetFileFromLocal(objImage.imagename);
 
                 return Ok(new
