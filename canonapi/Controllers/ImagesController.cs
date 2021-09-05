@@ -329,6 +329,72 @@ namespace canonapi.Controllers
         }
 
         [HttpGet]
+        [ActionName("GetImageIdsByBucket")]
+        public IActionResult GetImageIdsByBucket([FromQuery] DRStatus dr = DRStatus.All, [FromQuery] DataSource fromsushrut = DataSource.Both)
+        {
+            try
+            {
+                var claimsIdentity = this.User.Identity as ClaimsIdentity;
+                var username = claimsIdentity.FindFirst(ClaimTypes.Name)?.Value;
+                User userObj = _dbContext.Users.SingleOrDefault(u => u.username == username);
+
+                string qry = string.Empty;
+                IEnumerable<ImageOutIds> ids = null;
+                if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.Yes)
+                {
+                    string qryPart = dr != DRStatus.All ? string.Format(" AND (i.drlevel_sushrut = {0} OR iu.drlevel_byuser = {0})", dr.GetHashCode()) : string.Empty;
+                    qry = string.Format("SELECT i.id FROM images i LEFT OUTER JOIN imagedrbyusers iu ON i.imagename = iu.imagename WHERE(iu.userid = {0} OR iu.userid IS NULL) AND i.drlevel_kaggle = i.drlevel_sushrut{1};", userObj.id, qryPart);
+                }
+                else if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.No)
+                {
+                    string qryPart = string.Empty;
+                    switch (fromsushrut)
+                    {
+                        case DataSource.Sushrut:
+                            qryPart = dr != DRStatus.All ? string.Format(" AND (i.drlevel_sushrut = {0} OR iu.drlevel_byuser = {0})", dr.GetHashCode()) : string.Empty;
+                            break;
+                        case DataSource.Kaggle:
+                            qryPart = dr != DRStatus.All ? string.Format(" AND (i.drlevel_kaggle = {0} OR iu.drlevel_byuser = {0})", dr.GetHashCode()) : string.Empty;
+                            break;
+                        default:
+                            qryPart = string.Empty;
+                            break;
+                    }
+                    qry = string.Format("SELECT i.id FROM images i LEFT OUTER JOIN imagedrbyusers iu ON i.imagename = iu.imagename WHERE(iu.userid = {0} OR iu.userid IS NULL) AND i.drlevel_kaggle <> i.drlevel_sushrut{1};", userObj.id, qryPart);
+                }
+                else if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.No)
+                {
+                    string qryPart = dr != DRStatus.All ? string.Format(" AND (i.drlevel_sushrut = {0} OR i.drlevel_kaggle = {0}", dr.GetHashCode()) : string.Empty;
+                    qry = string.Format("SELECT i.id FROM images i LEFT OUTER JOIN imagedrbyusers iu ON i.imagename = iu.imagename WHERE(iu.userid = {0} OR iu.userid IS NULL){1};", userObj.id, qryPart);
+                }
+                ids = _dbContext.ExecuteQuery<ImageOutIds>(qry);
+
+                List<long> intIds = new List<long>();
+                if (ids != null && ids.Count() > default(int))
+                {
+                    ids.ToList().ForEach(i =>
+                    {
+                        intIds.Add(i.id);
+                    });
+                }
+
+                return Ok(new
+                {
+                    success = 1,
+                    data = intIds
+                });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new
+                {
+                    success = default(int),
+                    message = "Exception has been detected. Please contact to the authority."
+                });
+            }
+        }
+
+        [HttpGet]
         [ActionName("GetSingleImage")]
         public IActionResult GetSingleImage([FromQuery] long id)
         {
@@ -402,6 +468,13 @@ namespace canonapi.Controllers
                     User userObj = _dbContext.Users.SingleOrDefault(u => u.username == username);
                     obj.userid = userObj.id;
                     obj.kaggle_sushrut_drmatched = Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]);
+
+                    if (string.IsNullOrEmpty(obj.imagename))
+                    {
+                        var imageObj = _dbContext.Images.Where(i => i.id == obj.id).FirstOrDefault();
+                        obj.imagename = imageObj.imagename;
+                        obj.id = default(long);
+                    }
 
                     ImageDrByUser imgObj = _dbContext.ImageDrByUsers.Where(i => i.imagename == obj.imagename
                     && i.userid == obj.userid

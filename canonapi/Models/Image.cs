@@ -30,6 +30,11 @@ namespace canonapi.Models
         public string image { get; set; }
     }
 
+    public class ImageOutIds
+    {
+        public long id { get; set; }
+    }
+
     public class UserWisePredictionCounts
     {
         public long totalImages { get; set; }
@@ -76,5 +81,12 @@ namespace canonapi.Models
         No = 0,
         Yes = 1,
         All = 2
+    }
+
+    public enum DataSource
+    {
+        Both = 0,
+        Sushrut = 1,
+        Kaggle = 2
     }
 }
