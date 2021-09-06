@@ -2528,28 +2528,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Anik\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {},
-    "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\": {}
+    "C:\\Users\\anik.sen\\.nuget\\packages\\": {},
+    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Projects\\canonapi\\canonapi\\canonapi.csproj",
+      "projectUniqueName": "D:\\projects\\canonapi\\canonapi\\canonapi.csproj",
       "projectName": "canonapi",
-      "projectPath": "D:\\Projects\\canonapi\\canonapi\\canonapi.csproj",
-      "packagesPath": "C:\\Users\\Anik\\.nuget\\packages\\",
-      "outputPath": "D:\\Projects\\canonapi\\canonapi\\obj\\",
+      "projectPath": "D:\\projects\\canonapi\\canonapi\\canonapi.csproj",
+      "packagesPath": "C:\\Users\\anik.sen\\.nuget\\packages\\",
+      "outputPath": "D:\\projects\\canonapi\\canonapi\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
-        "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\"
+        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\Anik\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
+        "C:\\Users\\anik.sen\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "netcoreapp3.1"
