@@ -66,6 +66,10 @@ namespace canonapi.Controllers
                     && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.Yes.GetHashCode()
                     && u.drlevel_byuser == DRStatus.DR4.GetHashCode()).Count();
 
+                    counts.totalOthersFromPredicted = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
+                    && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.Yes.GetHashCode()
+                    && u.drlevel_byuser == DRStatus.Others.GetHashCode()).Count();
+
                     counts.totalImages = _dbContext.Images.Where(i => i.drlevel_kaggle == i.drlevel_sushrut).Count();
                 }
                 else if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.No)
@@ -92,6 +96,10 @@ namespace canonapi.Controllers
                     counts.totalDR4FromPredicted = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
                     && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.No.GetHashCode()
                     && u.drlevel_byuser == DRStatus.DR4.GetHashCode()).Count();
+
+                    counts.totalOthersFromPredicted = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
+                    && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.No.GetHashCode()
+                    && u.drlevel_byuser == DRStatus.Others.GetHashCode()).Count();
 
                     counts.totalImages = _dbContext.Images.Where(i => i.drlevel_kaggle != i.drlevel_sushrut).Count();
                 }
@@ -120,6 +128,10 @@ namespace canonapi.Controllers
                     && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.All.GetHashCode()
                     && u.drlevel_byuser == DRStatus.DR4.GetHashCode()).Count();
 
+                    counts.totalOthersFromPredicted = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
+                    && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.All.GetHashCode()
+                    && u.drlevel_byuser == DRStatus.Others.GetHashCode()).Count();
+
                     counts.totalImages = _dbContext.Images.Count();
                 }
 
@@ -145,22 +157,22 @@ namespace canonapi.Controllers
         {
             try
             {
-                /*var claimsIdentity = this.User.Identity as ClaimsIdentity;
+                var claimsIdentity = this.User.Identity as ClaimsIdentity;
                 var username = claimsIdentity.FindFirst(ClaimTypes.Name)?.Value;
-                User userObj = _dbContext.Users.SingleOrDefault(u => u.username == username);*/
+                User userObj = _dbContext.Users.SingleOrDefault(u => u.username == username);
 
                 IEnumerable<CountMaster> counts = new List<CountMaster>();
                 if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.Yes)
                 {
-                    counts = _dbContext.ExecuteQuery<CountMaster>(QueryHelper.qryMatchedResultCount);
+                    counts = _dbContext.ExecuteQuery<CountMaster>(string.Format(QueryHelper.qryMatchedResultCount, userObj.id));
                 }
                 else if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.No)
                 {
-                    counts = _dbContext.ExecuteQuery<CountMaster>(QueryHelper.qryUnmatchedResultCount);
+                    counts = _dbContext.ExecuteQuery<CountMaster>(string.Format(QueryHelper.qryUnmatchedResultCount, userObj.id));
                 }
                 else if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.All)
                 {
-                    counts = _dbContext.ExecuteQuery<CountMaster>(QueryHelper.qryAllResultCount);
+                    counts = _dbContext.ExecuteQuery<CountMaster>(string.Format(QueryHelper.qryAllResultCount, userObj.id));
                 }
                 SerializedCountResult result = new SerializedCountResult();
                 result.IsMatchedBucket = (KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]);
@@ -437,6 +449,7 @@ namespace canonapi.Controllers
                 obj.drlevel_kaggle = (DRStatus)objImage.drlevel_kaggle;
                 obj.drlevel_sushrut = (DRStatus)objImage.drlevel_sushrut;
                 obj.drlevel_byuser = userGradedImage != null ? (DRStatus)userGradedImage.drlevel_byuser : DRStatus.All;
+                obj.subdiseaseids = userGradedImage != null && !string.IsNullOrEmpty(userGradedImage.subdiseaseids) ? userGradedImage.subdiseaseids.Split(',').Select(int.Parse).ToList() : null;
                 obj.image = new ImageHandler(_configuration).GetFileFromLocal(objImage.imagename);
 
                 return Ok(new
@@ -457,12 +470,22 @@ namespace canonapi.Controllers
 
         [HttpPost]
         [ActionName("UpdateDrRecord")]
-        public IActionResult UpdateDrRecord([FromBody] ImageDrByUser obj)
+        public IActionResult UpdateDrRecord([FromBody] ImageDrByUserFinal objs)
         {
             try
             {
-                if (obj != null)
+                if (objs != null)
                 {
+                    ImageDrByUser obj = new ImageDrByUser();
+                    obj.id = objs.id;
+                    obj.imagename = objs.imagename;
+                    obj.kaggle_sushrut_drmatched = objs.kaggle_sushrut_drmatched;
+                    obj.userid = objs.userid;
+                    obj.drlevel_byuser = objs.drlevel_byuser;
+                    obj.subdiseaseids = objs.subdiseaseids != null && objs.subdiseaseids.Count() > default(int) ? string.Join(",", objs.subdiseaseids.Select(n => n.ToString()).ToArray()) : null;
+                    obj.createdon = objs.createdon;
+                    obj.modifiedon = objs.modifiedon;
+
                     var claimsIdentity = this.User.Identity as ClaimsIdentity;
                     var username = claimsIdentity.FindFirst(ClaimTypes.Name)?.Value;
                     User userObj = _dbContext.Users.SingleOrDefault(u => u.username == username);
