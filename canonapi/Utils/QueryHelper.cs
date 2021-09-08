@@ -82,6 +82,11 @@ public static class QueryHelper
     + "SELECT 0 AS Kaggle_DR0, 0 AS Sushrut_DR0, 0 AS Kaggle_DR1, 0 AS Sushrut_DR1, 0 AS Kaggle_DR2, 0 AS Sushrut_DR2, 0 AS Kaggle_DR3, 0 AS Sushrut_DR3, 0 AS Kaggle_DR4, COUNT(i.drlevel_sushrut) AS Sushrut_DR4 FROM images i LEFT OUTER JOIN imagedrbyusers iu ON i.imagename = iu.imagename WHERE i.drlevel_sushrut = 4 OR iu.drlevel_byuser = 4"
     + ") AS tot;";
 
+    public static string qryDiseaseMap = "SELECT d.id AS diseaseid, d.diseasename, s.id AS subdiseaseid, s.subdieseasename"
+    + " FROM diseasemap m"
+    + " LEFT OUTER JOIN disease d ON m.diseaseid = d.id"
+    + " LEFT OUTER JOIN subdisease s ON m.subdiseaseid = s.id;";
+
     public static List<T> ExecuteQuery<T>(this ApplicationDbContext db, string query) where T : class, new()
     {
         using (var command = db.Database.GetDbConnection().CreateCommand())
