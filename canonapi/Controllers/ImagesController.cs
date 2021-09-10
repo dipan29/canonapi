@@ -508,6 +508,7 @@ namespace canonapi.Controllers
                         imgObj.modifiedon = DateTime.Now;
                         //imgObj.kaggle_sushrut_drmatched = obj.kaggle_sushrut_drmatched;
                         imgObj.drlevel_byuser = obj.drlevel_byuser;
+                        imgObj.subdiseaseids = obj.subdiseaseids;
                         _dbContext.SaveChanges();
                     }
                     else
