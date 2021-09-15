@@ -1,4 +1,5 @@
 using canonapi.Authentication;
+using canonapi.configuration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -40,6 +41,10 @@ namespace canonapi
                     builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
                 });
             });
+
+            services.Configure<AnnotationConfiguration>(Configuration.GetSection("MongoDBConnectionSettings"));
+            services.AddScoped<IAnnotationService, AnnotationService>();
+
             /*services.AddCors(c =>
             {
                 c.AddPolicy("AllowOrigin", options => options.AllowAnyOrigin());

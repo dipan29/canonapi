@@ -1,4 +1,5 @@
 ﻿using canonapi.Authentication;
+using canonapi.configuration;
 using canonapi.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
@@ -23,11 +24,13 @@ namespace canonapi.Controllers
     {
         private ApplicationDbContext _dbContext;
         private readonly IConfiguration _configuration;
+        private readonly IAnnotationService _annotationService;
 
-        public ImagesController(ApplicationDbContext context, IConfiguration configuration)
+        public ImagesController(ApplicationDbContext context, IConfiguration configuration, IAnnotationService annotationService)
         {
             _configuration = configuration;
             _dbContext = context;
+            _annotationService = annotationService;
         }
 
         [HttpGet]
@@ -410,7 +413,7 @@ namespace canonapi.Controllers
         [ActionName("GetSingleImage")]
         public IActionResult GetSingleImage([FromQuery] long id)
         {
-            ImageOut obj = new ImageOut();
+            ImageOutWithAnnotation obj = new ImageOutWithAnnotation();
             try
             {
                 if (id <= default(long))
@@ -451,6 +454,7 @@ namespace canonapi.Controllers
                 obj.drlevel_byuser = userGradedImage != null ? (DRStatus)userGradedImage.drlevel_byuser : DRStatus.All;
                 obj.subdiseaseids = userGradedImage != null && !string.IsNullOrEmpty(userGradedImage.subdiseaseids) ? userGradedImage.subdiseaseids.Split(',').Select(int.Parse).ToList() : null;
                 obj.image = new ImageHandler(_configuration).GetFileFromLocal(objImage.imagename);
+                obj.regionannotation = userGradedImage != null && !string.IsNullOrEmpty(userGradedImage.regionannotation) ? GetSavedAnnotationById(userGradedImage.regionannotation) : null;
 
                 return Ok(new
                 {
@@ -485,6 +489,11 @@ namespace canonapi.Controllers
                     obj.subdiseaseids = objs.subdiseaseids != null && objs.subdiseaseids.Count() > default(int) ? string.Join(",", objs.subdiseaseids.Select(n => n.ToString()).ToArray()) : null;
                     obj.createdon = objs.createdon;
                     obj.modifiedon = objs.modifiedon;
+                    obj.regionannotation = objs.regionannotation == null ?
+                        null :
+                        (!string.IsNullOrEmpty(objs.regionannotation.id) ?
+                        SaveOrDeleteAnnotation(objs.regionannotation, objs.regionannotation.id) :
+                        SaveOrDeleteAnnotation(objs.regionannotation));
 
                     var claimsIdentity = this.User.Identity as ClaimsIdentity;
                     var username = claimsIdentity.FindFirst(ClaimTypes.Name)?.Value;
@@ -509,6 +518,19 @@ namespace canonapi.Controllers
                         //imgObj.kaggle_sushrut_drmatched = obj.kaggle_sushrut_drmatched;
                         imgObj.drlevel_byuser = obj.drlevel_byuser;
                         imgObj.subdiseaseids = obj.subdiseaseids;
+                        if (!string.IsNullOrEmpty(imgObj.regionannotation) && imgObj.regionannotation != obj.regionannotation)
+                        {
+                            try
+                            {
+                                SaveOrDeleteAnnotation(null, imgObj.regionannotation, true);
+                            }
+                            catch
+                            { }
+                            finally
+                            {
+                                imgObj.regionannotation = null;
+                            }
+                        }
                         _dbContext.SaveChanges();
                     }
                     else
@@ -541,6 +563,77 @@ namespace canonapi.Controllers
                     success = default(int),
                     message = "Exception has been detected. Please contact to the authority."
                 });
+            }
+        }
+
+        /*[HttpPost]
+        [AllowAnonymous]
+        [ActionName("Sample")]
+        public IActionResult Sample([FromBody] AnnotationObject obj)
+        {
+            var x = SaveOrDeleteAnnotation(obj, obj.id);
+            return Ok(new
+            {
+                success = 1,
+                message = x
+            });
+        }*/
+
+        private AnnotationObject GetSavedAnnotationById(string id)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(id))
+                {
+                    return _annotationService.GetById(id);
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        [NonAction]
+        private string SaveOrDeleteAnnotation(AnnotationObject obj, string id = "", bool delete = false)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(id))
+                {
+                    var annoObj = _annotationService.GetById(id);
+                    if (annoObj != null)
+                    {
+                        if (!delete)
+                        {
+                            _annotationService.Update(id, obj);
+                            return id;
+                        }
+                        else
+                        {
+                            _annotationService.Delete(annoObj.id);
+                            return annoObj.id;
+                        }
+                    }
+                    else
+                    {
+                        var x = _annotationService.Create(obj);
+                        return x.id;
+                    }
+                }
+                else
+                {
+                    var x = _annotationService.Create(obj);
+                    return x.id;
+                }
+            }
+            catch
+            {
+                return null;
             }
         }
     }

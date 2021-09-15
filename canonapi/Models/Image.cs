@@ -31,6 +31,18 @@ namespace canonapi.Models
         public string image { get; set; }
     }
 
+    public class ImageOutWithAnnotation
+    {
+        public long id { get; set; }
+        public DRStatus drlevel_kaggle { get; set; }
+        public DRStatus drlevel_sushrut { get; set; }
+        public DRStatus drlevel_byuser { get; set; }
+        public IEnumerable<int> subdiseaseids { get; set; }
+        public string thumbnail { get; set; }
+        public string image { get; set; }
+        public AnnotationObject regionannotation { get; set; }
+    }
+
     public class ImageOutIds
     {
         public long id { get; set; }

@@ -15,6 +15,7 @@ namespace canonapi.Models
         public int userid { get; set; }
         public DateTime createdon { get; set; }
         public DateTime? modifiedon { get; set; }
+        public string regionannotation { get; set; }
     }
 
     public class ImageDrByUserFinal
@@ -27,5 +28,6 @@ namespace canonapi.Models
         public int userid { get; set; }
         public DateTime createdon { get; set; }
         public DateTime? modifiedon { get; set; }
+        public AnnotationObject regionannotation { get; set; }
     }
 }
