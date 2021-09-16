@@ -95,7 +95,7 @@ public static class QueryHelper
     + "SELECT 0 AS Kaggle_DR0, 0 AS Sushrut_DR0, 0 AS Kaggle_DR1, 0 AS Sushrut_DR1, 0 AS Kaggle_DR2, 0 AS Sushrut_DR2, 0 AS Kaggle_DR3, 0 AS Sushrut_DR3, 0 AS Kaggle_DR4, 0 AS Sushrut_DR4, 0 AS Kaggle_Others, COUNT(i.drlevel_kaggle) AS Sushrut_Others FROM images i LEFT OUTER JOIN imagedrbyusers iu ON i.imagename = iu.imagename WHERE i.drlevel_sushrut = 5 OR (iu.drlevel_byuser = 5 AND iu.userid = {0})"
     + ") AS tot;";
 
-    public static string qryDiseaseMap = "SELECT d.id AS diseaseid, d.diseasename, s.id AS subdiseaseid, s.subdieseasename"
+    public static string qryDiseaseMap = "SELECT d.id AS diseaseid, d.diseasename, s.id AS subdiseaseid, s.subdieseasename, s.colorname AS colorname, s.colorcode AS colorcode"
     + " FROM diseasemap m"
     + " LEFT OUTER JOIN disease d ON m.diseaseid = d.id"
     + " LEFT OUTER JOIN subdisease s ON m.subdiseaseid = s.id;";

@@ -134,3 +134,4 @@ D:\Projects\canonapi\canonapi\bin\Debug\netcoreapp3.1\runtimes\win\native\snappy
 D:\Projects\canonapi\canonapi\bin\Debug\netcoreapp3.1\runtimes\linux\native\libmongocrypt.so
 D:\Projects\canonapi\canonapi\bin\Debug\netcoreapp3.1\runtimes\osx\native\libmongocrypt.dylib
 D:\Projects\canonapi\canonapi\bin\Debug\netcoreapp3.1\runtimes\win\native\mongocrypt.dll
+D:\Projects\canonapi\canonapi\obj\Debug\netcoreapp3.1\canonapi.csproj.AssemblyReference.cache
