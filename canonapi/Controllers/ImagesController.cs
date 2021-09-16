@@ -377,9 +377,9 @@ namespace canonapi.Controllers
                     }
                     qry = string.Format("SELECT i.id FROM images i LEFT OUTER JOIN imagedrbyusers iu ON i.imagename = iu.imagename WHERE(iu.userid = {0} OR iu.userid IS NULL) AND i.drlevel_kaggle <> i.drlevel_sushrut{1};", userObj.id, qryPart);
                 }
-                else if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.No)
+                else if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.All)
                 {
-                    string qryPart = dr != DRStatus.All ? string.Format(" AND (i.drlevel_sushrut = {0} OR i.drlevel_kaggle = {0}", dr.GetHashCode()) : string.Empty;
+                    string qryPart = dr != DRStatus.All ? string.Format(" AND (i.drlevel_sushrut = {0} OR i.drlevel_kaggle = {0})", dr.GetHashCode()) : string.Empty;
                     qry = string.Format("SELECT i.id FROM images i LEFT OUTER JOIN imagedrbyusers iu ON i.imagename = iu.imagename WHERE(iu.userid = {0} OR iu.userid IS NULL){1};", userObj.id, qryPart);
                 }
                 ids = _dbContext.ExecuteQuery<ImageOutIds>(qry);
@@ -397,6 +397,57 @@ namespace canonapi.Controllers
                 {
                     success = 1,
                     data = intIds
+                });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new
+                {
+                    success = default(int),
+                    message = "Exception has been detected. Please contact to the authority."
+                });
+            }
+        }
+
+        [HttpGet]
+        [ActionName("GetLastSubmittedImageByBucket")]
+        public IActionResult GetLastSubmittedImageByBucket([FromQuery] DRStatus dr = DRStatus.All)
+        {
+            try
+            {
+                var claimsIdentity = this.User.Identity as ClaimsIdentity;
+                var username = claimsIdentity.FindFirst(ClaimTypes.Name)?.Value;
+                User userObj = _dbContext.Users.SingleOrDefault(u => u.username == username);
+
+                string qry = string.Empty;
+                IEnumerable<ImageOutIds> ids = null;
+                if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.Yes)
+                {
+                    string qryPart = dr != DRStatus.All ? string.Format(" AND iu.kaggle_sushrut_drmatched = 1", dr.GetHashCode()) : string.Empty;
+                    qry = string.Format("SELECT i.id FROM images i WHERE i.imagename = (SELECT iu.imagename FROM imagedrbyusers iu WHERE iu.userid = {0} AND iu.drlevel_byuser = {1}{2} ORDER BY iu.createdon DESC LIMIT 1);", userObj.id, dr.GetHashCode(), qryPart);
+                }
+                else if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.No)
+                {
+                    string qryPart = dr != DRStatus.All ? string.Format(" AND iu.kaggle_sushrut_drmatched = 0", dr.GetHashCode()) : string.Empty;
+                    qry = string.Format("SELECT i.id FROM images i WHERE i.imagename = (SELECT iu.imagename FROM imagedrbyusers iu WHERE iu.userid = {0} AND iu.drlevel_byuser = {1}{2} ORDER BY iu.createdon DESC LIMIT 1);", userObj.id, dr.GetHashCode(), qryPart);
+                }
+                else if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.All)
+                {
+                    string qryPart = string.Empty;
+                    qry = string.Format("SELECT i.id FROM images i WHERE i.imagename = (SELECT iu.imagename FROM imagedrbyusers iu WHERE iu.userid = {0} AND iu.drlevel_byuser = {1}{2} ORDER BY iu.createdon DESC LIMIT 1);", userObj.id, dr.GetHashCode(), qryPart);
+                }
+                ids = _dbContext.ExecuteQuery<ImageOutIds>(qry);
+
+                long? intId = null;
+                if (ids != null && ids.Count() > default(int))
+                {
+                    intId = ids.ToList().FirstOrDefault().id;
+                }
+
+                return Ok(new
+                {
+                    success = 1,
+                    data = intId
                 });
             }
             catch (Exception ex)
@@ -489,7 +540,7 @@ namespace canonapi.Controllers
                     obj.subdiseaseids = objs.subdiseaseids != null && objs.subdiseaseids.Count() > default(int) ? string.Join(",", objs.subdiseaseids.Select(n => n.ToString()).ToArray()) : null;
                     obj.createdon = objs.createdon;
                     obj.modifiedon = objs.modifiedon;
-                    obj.regionannotation = objs.regionannotation == null ?
+                    obj.regionannotation = objs.regionannotation == null || objs.regionannotation.markers == null ?
                         null :
                         (!string.IsNullOrEmpty(objs.regionannotation.id) ?
                         SaveOrDeleteAnnotation(objs.regionannotation, objs.regionannotation.id) :
@@ -508,9 +559,25 @@ namespace canonapi.Controllers
                         obj.id = default(long);
                     }
 
-                    ImageDrByUser imgObj = _dbContext.ImageDrByUsers.Where(i => i.imagename == obj.imagename
-                    && i.userid == obj.userid
-                    && i.kaggle_sushrut_drmatched == obj.kaggle_sushrut_drmatched).FirstOrDefault();
+                    ImageDrByUser imgObj = null;
+                    if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.Yes)
+                    {
+                        imgObj = _dbContext.ImageDrByUsers.Where(i => i.imagename == obj.imagename
+                        && i.userid == obj.userid
+                        && i.kaggle_sushrut_drmatched == obj.kaggle_sushrut_drmatched).FirstOrDefault();
+                    }
+                    else if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.No)
+                    {
+                        imgObj = _dbContext.ImageDrByUsers.Where(i => i.imagename == obj.imagename
+                        && i.userid == obj.userid
+                        && i.kaggle_sushrut_drmatched != obj.kaggle_sushrut_drmatched).FirstOrDefault();
+                    }
+                    else
+                    {
+                        imgObj = _dbContext.ImageDrByUsers.Where(i => i.imagename == obj.imagename
+                        && i.userid == obj.userid).FirstOrDefault();
+                    }
+
                     if (imgObj != null)
                     {
                         // update
@@ -518,18 +585,29 @@ namespace canonapi.Controllers
                         //imgObj.kaggle_sushrut_drmatched = obj.kaggle_sushrut_drmatched;
                         imgObj.drlevel_byuser = obj.drlevel_byuser;
                         imgObj.subdiseaseids = obj.subdiseaseids;
-                        if (!string.IsNullOrEmpty(imgObj.regionannotation) && imgObj.regionannotation != obj.regionannotation)
+                        if (!string.IsNullOrEmpty(imgObj.regionannotation))
                         {
-                            try
+                            if (string.IsNullOrEmpty(obj.regionannotation))
                             {
-                                SaveOrDeleteAnnotation(null, imgObj.regionannotation, true);
+                                try
+                                {
+                                    SaveOrDeleteAnnotation(null, imgObj.regionannotation, true);
+                                }
+                                catch
+                                { }
+                                finally
+                                {
+                                    imgObj.regionannotation = null;
+                                }
                             }
-                            catch
-                            { }
-                            finally
+                            else
                             {
-                                imgObj.regionannotation = null;
+                                imgObj.regionannotation = obj.regionannotation;
                             }
+                        }
+                        else
+                        {
+                            imgObj.regionannotation = obj.regionannotation;
                         }
                         _dbContext.SaveChanges();
                     }
@@ -579,6 +657,7 @@ namespace canonapi.Controllers
             });
         }*/
 
+        [NonAction]
         private AnnotationObject GetSavedAnnotationById(string id)
         {
             try
