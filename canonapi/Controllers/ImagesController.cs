@@ -46,6 +46,108 @@ namespace canonapi.Controllers
 
                 if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.Yes)
                 {
+                    counts.totalImages = _dbContext.Images.Where(i => i.drlevel_kaggle == i.drlevel_sushrut).Count();
+                    counts.totalImagesPredicted = _dbContext.ImageDrByUsers.Where(i => i.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.Yes.GetHashCode()).Count();
+                    //DR0 Count
+                    {
+                        counts.totalDR0FromPredicted = new BucketCalculator().CalculateSpecificBucketByCondition(_dbContext,
+                            DRStatus.DR0, KaggleAndSushrutMatchedImages.Yes, userObj.id);
+                    }
+                    //DR1 Count
+                    {
+                        counts.totalDR1FromPredicted = new BucketCalculator().CalculateSpecificBucketByCondition(_dbContext,
+                            DRStatus.DR1, KaggleAndSushrutMatchedImages.Yes, userObj.id);
+                    }
+                    //DR2 Count
+                    {
+                        counts.totalDR2FromPredicted = new BucketCalculator().CalculateSpecificBucketByCondition(_dbContext,
+                            DRStatus.DR2, KaggleAndSushrutMatchedImages.Yes, userObj.id);
+                    }
+                    //DR3 Count
+                    {
+                        counts.totalDR3FromPredicted = new BucketCalculator().CalculateSpecificBucketByCondition(_dbContext,
+                            DRStatus.DR3, KaggleAndSushrutMatchedImages.Yes, userObj.id);
+                    }
+                    //DR4 Count
+                    {
+                        counts.totalDR4FromPredicted = new BucketCalculator().CalculateSpecificBucketByCondition(_dbContext,
+                            DRStatus.DR4, KaggleAndSushrutMatchedImages.Yes, userObj.id);
+                    }
+                    //Others Count
+                    {
+                        counts.totalOthersFromPredicted = new BucketCalculator().CalculateSpecificBucketByCondition(_dbContext,
+                            DRStatus.Others, KaggleAndSushrutMatchedImages.Yes, userObj.id);
+                    }
+                }
+                else if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.No)
+                {
+                    counts.totalImages = _dbContext.Images.Where(i => i.drlevel_kaggle != i.drlevel_sushrut).Count();
+                    counts.totalImagesPredicted = _dbContext.ImageDrByUsers.Where(i => i.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.No.GetHashCode()).Count();
+                    //DR0 Count
+                    {
+                        counts.totalDR0FromPredicted = new BucketCalculator().CalculateSpecificBucketByCondition(_dbContext,
+                            DRStatus.DR0, KaggleAndSushrutMatchedImages.No, userObj.id);
+                    }
+                    //DR1 Count
+                    {
+                        counts.totalDR1FromPredicted = new BucketCalculator().CalculateSpecificBucketByCondition(_dbContext,
+                            DRStatus.DR1, KaggleAndSushrutMatchedImages.No, userObj.id);
+                    }
+                    //DR2 Count
+                    {
+                        counts.totalDR2FromPredicted = new BucketCalculator().CalculateSpecificBucketByCondition(_dbContext,
+                            DRStatus.DR2, KaggleAndSushrutMatchedImages.No, userObj.id);
+                    }
+                    //DR3 Count
+                    {
+                        counts.totalDR3FromPredicted = new BucketCalculator().CalculateSpecificBucketByCondition(_dbContext,
+                            DRStatus.DR3, KaggleAndSushrutMatchedImages.No, userObj.id);
+                    }
+                    //DR4 Count
+                    {
+                        counts.totalDR4FromPredicted = new BucketCalculator().CalculateSpecificBucketByCondition(_dbContext,
+                            DRStatus.DR4, KaggleAndSushrutMatchedImages.No, userObj.id);
+                    }
+                    //Others Count
+                    {
+                        counts.totalOthersFromPredicted = new BucketCalculator().CalculateSpecificBucketByCondition(_dbContext,
+                            DRStatus.Others, KaggleAndSushrutMatchedImages.No, userObj.id);
+                    }
+                }
+                else
+                {
+
+                }
+
+                return Ok(new
+                {
+                    success = 1,
+                    data = counts
+                });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new
+                {
+                    success = default(int),
+                    message = "Exception has been detected. Please contact to the authority."
+                });
+            }
+        }
+
+        [HttpGet]
+        [ActionName("GetImageCountEx")]
+        public IActionResult GetImageCountEx()
+        {
+            UserWisePredictionCounts counts = new UserWisePredictionCounts();
+            try
+            {
+                var claimsIdentity = this.User.Identity as ClaimsIdentity;
+                var username = claimsIdentity.FindFirst(ClaimTypes.Name)?.Value;
+                User userObj = _dbContext.Users.SingleOrDefault(u => u.username == username);
+
+                if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.Yes)
+                {
                     counts.totalImagesPredicted = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
                     && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.Yes.GetHashCode()).Count();
 
@@ -157,6 +259,139 @@ namespace canonapi.Controllers
         [HttpGet]
         [ActionName("GetImageCountByBucket")]
         public IActionResult GetImageCountByBucket()
+        {
+            try
+            {
+                var claimsIdentity = this.User.Identity as ClaimsIdentity;
+                var username = claimsIdentity.FindFirst(ClaimTypes.Name)?.Value;
+                User userObj = _dbContext.Users.SingleOrDefault(u => u.username == username);
+
+                List<CountMaster> counts = new List<CountMaster>();
+                int xKaggleDR0, xKaggleDR1, xKaggleDR2, xKaggleDR3, xKaggleDR4, xKaggleOthers, xSushrutDR0, xSushrutDR1, xSushrutDR2, xSushrutDR3, xSushrutDR4, xSushrutOthers;
+                if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.Yes)
+                {
+                    xKaggleDR0 = xSushrutDR0 = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.DR0, KaggleAndSushrutMatchedImages.Yes, userObj.id, DataSource.Sushrut);
+
+                    xKaggleDR1 = xSushrutDR1 = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.DR1, KaggleAndSushrutMatchedImages.Yes, userObj.id, DataSource.Sushrut);
+
+                    xKaggleDR2 = xSushrutDR2 = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.DR2, KaggleAndSushrutMatchedImages.Yes, userObj.id, DataSource.Sushrut);
+
+                    xKaggleDR3 = xSushrutDR3 = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.DR3, KaggleAndSushrutMatchedImages.Yes, userObj.id, DataSource.Sushrut);
+
+                    xKaggleDR4 = xSushrutDR4 = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.DR4, KaggleAndSushrutMatchedImages.Yes, userObj.id, DataSource.Sushrut);
+
+                    xKaggleOthers = xSushrutOthers = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.Others, KaggleAndSushrutMatchedImages.Yes, userObj.id, DataSource.Sushrut);
+
+                    counts.Add(new CountMaster()
+                    {
+                        Kaggle_DR0 = xKaggleDR0,
+                        Kaggle_DR1 = xKaggleDR1,
+                        Kaggle_DR2 = xKaggleDR2,
+                        Kaggle_DR3 = xKaggleDR3,
+                        Kaggle_DR4 = xKaggleDR4,
+                        Kaggle_Others = xKaggleOthers,
+                        Sushrut_DR0 = xSushrutDR0,
+                        Sushrut_DR1 = xSushrutDR1,
+                        Sushrut_DR2 = xSushrutDR2,
+                        Sushrut_DR3 = xSushrutDR3,
+                        Sushrut_DR4 = xSushrutDR4,
+                        Sushrut_Others = xSushrutOthers
+                    });
+                }
+                else if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.No)
+                {
+                    xKaggleDR0 = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.DR0, KaggleAndSushrutMatchedImages.No, userObj.id, DataSource.Kaggle);
+                    xSushrutDR0 = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.DR0, KaggleAndSushrutMatchedImages.No, userObj.id, DataSource.Sushrut);
+
+                    xKaggleDR1 = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.DR1, KaggleAndSushrutMatchedImages.No, userObj.id, DataSource.Kaggle);
+                    xSushrutDR1 = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.DR1, KaggleAndSushrutMatchedImages.No, userObj.id, DataSource.Sushrut);
+
+                    xKaggleDR2 = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.DR2, KaggleAndSushrutMatchedImages.No, userObj.id, DataSource.Kaggle);
+                    xSushrutDR2 = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.DR2, KaggleAndSushrutMatchedImages.No, userObj.id, DataSource.Sushrut);
+
+                    xKaggleDR3 = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.DR3, KaggleAndSushrutMatchedImages.No, userObj.id, DataSource.Kaggle);
+                    xSushrutDR3 = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.DR3, KaggleAndSushrutMatchedImages.No, userObj.id, DataSource.Sushrut);
+
+                    xKaggleDR4 = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.DR4, KaggleAndSushrutMatchedImages.No, userObj.id, DataSource.Kaggle);
+                    xSushrutDR4 = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.DR4, KaggleAndSushrutMatchedImages.No, userObj.id, DataSource.Sushrut);
+
+                    xKaggleOthers = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.Others, KaggleAndSushrutMatchedImages.No, userObj.id, DataSource.Kaggle);
+                    xSushrutOthers = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.Others, KaggleAndSushrutMatchedImages.No, userObj.id, DataSource.Sushrut);
+
+                    counts.Add(new CountMaster()
+                    {
+                        Kaggle_DR0 = xKaggleDR0,
+                        Kaggle_DR1 = xKaggleDR1,
+                        Kaggle_DR2 = xKaggleDR2,
+                        Kaggle_DR3 = xKaggleDR3,
+                        Kaggle_DR4 = xKaggleDR4,
+                        Kaggle_Others = xKaggleOthers,
+                        Sushrut_DR0 = xSushrutDR0,
+                        Sushrut_DR1 = xSushrutDR1,
+                        Sushrut_DR2 = xSushrutDR2,
+                        Sushrut_DR3 = xSushrutDR3,
+                        Sushrut_DR4 = xSushrutDR4,
+                        Sushrut_Others = xSushrutOthers
+                    });
+                }
+                else if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.All)
+                {
+                    xKaggleDR0 = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.DR0, KaggleAndSushrutMatchedImages.All, userObj.id, DataSource.Kaggle);
+                    xSushrutDR0 = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.DR0, KaggleAndSushrutMatchedImages.All, userObj.id, DataSource.Sushrut);
+
+                    xKaggleDR1 = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.DR1, KaggleAndSushrutMatchedImages.All, userObj.id, DataSource.Kaggle);
+                    xSushrutDR1 = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.DR1, KaggleAndSushrutMatchedImages.All, userObj.id, DataSource.Sushrut);
+
+                    xKaggleDR2 = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.DR2, KaggleAndSushrutMatchedImages.All, userObj.id, DataSource.Kaggle);
+                    xSushrutDR2 = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.DR2, KaggleAndSushrutMatchedImages.All, userObj.id, DataSource.Sushrut);
+
+                    xKaggleDR3 = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.DR3, KaggleAndSushrutMatchedImages.All, userObj.id, DataSource.Kaggle);
+                    xSushrutDR3 = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.DR3, KaggleAndSushrutMatchedImages.All, userObj.id, DataSource.Sushrut);
+
+                    xKaggleDR4 = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.DR4, KaggleAndSushrutMatchedImages.All, userObj.id, DataSource.Kaggle);
+                    xSushrutDR4 = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.DR4, KaggleAndSushrutMatchedImages.All, userObj.id, DataSource.Sushrut);
+
+                    xKaggleOthers = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.Others, KaggleAndSushrutMatchedImages.All, userObj.id, DataSource.Kaggle);
+                    xSushrutOthers = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.Others, KaggleAndSushrutMatchedImages.All, userObj.id, DataSource.Sushrut);
+
+                    counts.Add(new CountMaster()
+                    {
+                        Kaggle_DR0 = xKaggleDR0,
+                        Kaggle_DR1 = xKaggleDR1,
+                        Kaggle_DR2 = xKaggleDR2,
+                        Kaggle_DR3 = xKaggleDR3,
+                        Kaggle_DR4 = xKaggleDR4,
+                        Kaggle_Others = xKaggleOthers,
+                        Sushrut_DR0 = xSushrutDR0,
+                        Sushrut_DR1 = xSushrutDR1,
+                        Sushrut_DR2 = xSushrutDR2,
+                        Sushrut_DR3 = xSushrutDR3,
+                        Sushrut_DR4 = xSushrutDR4,
+                        Sushrut_Others = xSushrutOthers
+                    });
+                }
+                SerializedCountResult result = new SerializedCountResult();
+                result.IsMatchedBucket = (KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]);
+                result.counts = counts;
+                return Ok(new
+                {
+                    success = 1,
+                    data = result
+                });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new
+                {
+                    success = default(int),
+                    message = "Exception has been detected. Please contact to the authority."
+                });
+            }
+        }
+
+        [HttpGet]
+        [ActionName("GetImageCountByBucketEx")]
+        public IActionResult GetImageCountByBucketEx()
         {
             try
             {
@@ -346,6 +581,47 @@ namespace canonapi.Controllers
         [HttpGet]
         [ActionName("GetImageIdsByBucket")]
         public IActionResult GetImageIdsByBucket([FromQuery] DRStatus dr = DRStatus.All, [FromQuery] DataSource fromsushrut = DataSource.Both)
+        {
+            try
+            {
+                IEnumerable<long> intIds = new List<long>();
+
+                var claimsIdentity = this.User.Identity as ClaimsIdentity;
+                var username = claimsIdentity.FindFirst(ClaimTypes.Name)?.Value;
+                User userObj = _dbContext.Users.SingleOrDefault(u => u.username == username);
+
+                if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.Yes)
+                {
+                    intIds = new BucketCalculator().GetAllIdsForSpecificBucketByPredictionSourceCondition(_dbContext, dr, KaggleAndSushrutMatchedImages.Yes, userObj.id, fromsushrut);
+                }
+                else if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.No)
+                {
+                    intIds = new BucketCalculator().GetAllIdsForSpecificBucketByPredictionSourceCondition(_dbContext, dr, KaggleAndSushrutMatchedImages.No, userObj.id, fromsushrut);
+                }
+                else
+                {
+                    intIds = new BucketCalculator().GetAllIdsForSpecificBucketByPredictionSourceCondition(_dbContext, dr, KaggleAndSushrutMatchedImages.All, userObj.id, fromsushrut);
+                }
+
+                return Ok(new
+                {
+                    success = 1,
+                    data = intIds
+                });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new
+                {
+                    success = default(int),
+                    message = "Exception has been detected. Please contact to the authority."
+                });
+            }
+        }
+
+        [HttpGet]
+        [ActionName("GetImageIdsByBucketEx")]
+        public IActionResult GetImageIdsByBucketEx([FromQuery] DRStatus dr = DRStatus.All, [FromQuery] DataSource fromsushrut = DataSource.Both)
         {
             try
             {
@@ -643,19 +919,6 @@ namespace canonapi.Controllers
                 });
             }
         }
-
-        /*[HttpPost]
-        [AllowAnonymous]
-        [ActionName("Sample")]
-        public IActionResult Sample([FromBody] AnnotationObject obj)
-        {
-            var x = SaveOrDeleteAnnotation(obj, obj.id);
-            return Ok(new
-            {
-                success = 1,
-                message = x
-            });
-        }*/
 
         [NonAction]
         private AnnotationObject GetSavedAnnotationById(string id)
