@@ -49,14 +49,14 @@ public class ImageHandler
     {
         try
         {
-            string filepath = string.Format("{0}{1}{2}", isthumbnail ? _configuration["LocalThumbnailPath"] : _configuration["LocalFilePath"], filename, isthumbnail ? ".jpg" : ".jpeg");
+            string filepath = string.Format("{0}{1}{2}", isthumbnail ? _configuration["LocalThumbnailPath"] : _configuration["LocalFilePath"], filename, isthumbnail ? ".jpg" : ".jpg");
 
             using (MemoryStream ms = new MemoryStream())
             {
                 using (FileStream file = new FileStream(filepath, FileMode.Open, FileAccess.Read))
                 {
                     file.CopyTo(ms);
-                    return string.Format("data:{0};base64,{1}", isthumbnail ? "image/jpg" : "image/jpeg", Convert.ToBase64String(ms.ToArray()));
+                    return string.Format("data:{0};base64,{1}", isthumbnail ? "image/jpg" : "image/jpg", Convert.ToBase64String(ms.ToArray()));
                 }
             }
         }
