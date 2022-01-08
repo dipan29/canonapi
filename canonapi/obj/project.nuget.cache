@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "l4ITT7dDoCg2+Kt/tfJ0cgTmg67y8uhye3jtCiBc84rEnx/Jb2xQg7oPPpeV5oki0PXKIQ/AoVgHIq7xVyeIjA==",
+  "dgSpecHash": "yevUgrdxYzWwFiuVRGzNp/IgaaA2SNI0MLH5PiZp7FhO5XuxBh4dPJszk6qT3yHGrL4wlwLo1BN/4csNr67Yuw==",
   "success": true,
   "projectFilePath": "C:\\Users\\Dipan Roy\\Office\\canonapi\\canonapi\\canonapi.csproj",
   "expectedPackageFiles": [
@@ -86,11 +86,7 @@
     "C:\\Users\\Dipan Roy\\.nuget\\packages\\system.security.permissions\\4.5.0\\system.security.permissions.4.5.0.nupkg.sha512",
     "C:\\Users\\Dipan Roy\\.nuget\\packages\\system.security.principal.windows\\4.5.0\\system.security.principal.windows.4.5.0.nupkg.sha512",
     "C:\\Users\\Dipan Roy\\.nuget\\packages\\system.text.encoding.codepages\\4.5.1\\system.text.encoding.codepages.4.5.1.nupkg.sha512",
-    "C:\\Users\\Dipan Roy\\.nuget\\packages\\system.text.encodings.web\\4.5.0\\system.text.encodings.web.4.5.0.nupkg.sha512",
-    "C:\\Users\\Dipan Roy\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\3.1.21\\microsoft.netcore.app.host.win-x64.3.1.21.nupkg.sha512",
-    "C:\\Users\\Dipan Roy\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\3.1.10\\microsoft.aspnetcore.app.ref.3.1.10.nupkg.sha512",
-    "C:\\Users\\Dipan Roy\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\3.1.0\\microsoft.windowsdesktop.app.ref.3.1.0.nupkg.sha512",
-    "C:\\Users\\Dipan Roy\\.nuget\\packages\\microsoft.netcore.app.ref\\3.1.0\\microsoft.netcore.app.ref.3.1.0.nupkg.sha512"
+    "C:\\Users\\Dipan Roy\\.nuget\\packages\\system.text.encodings.web\\4.5.0\\system.text.encodings.web.4.5.0.nupkg.sha512"
   ],
   "logs": []
 }
