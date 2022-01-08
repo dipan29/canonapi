@@ -776,6 +776,7 @@ namespace canonapi.Controllers
                     && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.All.GetHashCode()).FirstOrDefault();
                 }
                 obj.id = objImage.id;
+                obj.imagename = objImage.imagename;
                 obj.drlevel_kaggle = (DRStatus)objImage.drlevel_kaggle;
                 obj.drlevel_sushrut = (DRStatus)objImage.drlevel_sushrut;
                 obj.drlevel_byuser = userGradedImage != null ? (DRStatus)userGradedImage.drlevel_byuser : DRStatus.All;

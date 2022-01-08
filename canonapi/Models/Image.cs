@@ -34,6 +34,7 @@ namespace canonapi.Models
     public class ImageOutWithAnnotation
     {
         public long id { get; set; }
+        public string imagename { get; set; }
         public DRStatus drlevel_kaggle { get; set; }
         public DRStatus drlevel_sushrut { get; set; }
         public DRStatus drlevel_byuser { get; set; }
