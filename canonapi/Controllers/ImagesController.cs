@@ -48,6 +48,11 @@ namespace canonapi.Controllers
                 {
                     counts.totalImages = _dbContext.Images.Where(i => i.drlevel_kaggle == i.drlevel_sushrut).Count();
                     counts.totalImagesPredicted = _dbContext.ImageDrByUsers.Where(i => i.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.Yes.GetHashCode()).Count();
+                    //Ungraded Count
+                    {
+                        counts.totalUngradedImages = new BucketCalculator().CalculateSpecificBucketByCondition(_dbContext,
+                            DRStatus.Ungraded, KaggleAndSushrutMatchedImages.Yes, userObj.id);
+                    }
                     //DR0 Count
                     {
                         counts.totalDR0FromPredicted = new BucketCalculator().CalculateSpecificBucketByCondition(_dbContext,
@@ -78,11 +83,21 @@ namespace canonapi.Controllers
                         counts.totalOthersFromPredicted = new BucketCalculator().CalculateSpecificBucketByCondition(_dbContext,
                             DRStatus.Others, KaggleAndSushrutMatchedImages.Yes, userObj.id);
                     }
+                    //Ungradable Count
+                    {
+                        counts.totalUngradableImages = new BucketCalculator().CalculateSpecificBucketByCondition(_dbContext,
+                            DRStatus.Ungradable, KaggleAndSushrutMatchedImages.Yes, userObj.id);
+                    }
                 }
                 else if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.No)
                 {
                     counts.totalImages = _dbContext.Images.Where(i => i.drlevel_kaggle != i.drlevel_sushrut).Count();
                     counts.totalImagesPredicted = _dbContext.ImageDrByUsers.Where(i => i.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.No.GetHashCode()).Count();
+                    //Ungraded Count
+                    {
+                        counts.totalUngradedImages = new BucketCalculator().CalculateSpecificBucketByCondition(_dbContext,
+                            DRStatus.Ungraded, KaggleAndSushrutMatchedImages.No, userObj.id);
+                    }
                     //DR0 Count
                     {
                         counts.totalDR0FromPredicted = new BucketCalculator().CalculateSpecificBucketByCondition(_dbContext,
@@ -112,6 +127,11 @@ namespace canonapi.Controllers
                     {
                         counts.totalOthersFromPredicted = new BucketCalculator().CalculateSpecificBucketByCondition(_dbContext,
                             DRStatus.Others, KaggleAndSushrutMatchedImages.No, userObj.id);
+                    }
+                    //Ungradable Count
+                    {
+                        counts.totalUngradableImages = new BucketCalculator().CalculateSpecificBucketByCondition(_dbContext,
+                            DRStatus.Ungradable, KaggleAndSushrutMatchedImages.No, userObj.id);
                     }
                 }
                 else
@@ -151,6 +171,10 @@ namespace canonapi.Controllers
                     counts.totalImagesPredicted = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
                     && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.Yes.GetHashCode()).Count();
 
+                    counts.totalUngradedImages = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
+                    && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.Yes.GetHashCode()
+                    && u.drlevel_byuser == DRStatus.Ungraded.GetHashCode()).Count();
+
                     counts.totalDR0FromPredicted = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
                     && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.Yes.GetHashCode()
                     && u.drlevel_byuser == DRStatus.DR0.GetHashCode()).Count();
@@ -174,6 +198,10 @@ namespace canonapi.Controllers
                     counts.totalOthersFromPredicted = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
                     && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.Yes.GetHashCode()
                     && u.drlevel_byuser == DRStatus.Others.GetHashCode()).Count();
+
+                    counts.totalUngradableImages = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
+                    && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.Yes.GetHashCode()
+                    && u.drlevel_byuser == DRStatus.Ungradable.GetHashCode()).Count();
 
                     counts.totalImages = _dbContext.Images.Where(i => i.drlevel_kaggle == i.drlevel_sushrut).Count();
                 }
@@ -182,6 +210,10 @@ namespace canonapi.Controllers
                     counts.totalImagesPredicted = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
                     && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.No.GetHashCode()).Count();
 
+                    counts.totalUngradedImages = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
+                    && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.No.GetHashCode()
+                    && u.drlevel_byuser == DRStatus.Ungraded.GetHashCode()).Count();
+
                     counts.totalDR0FromPredicted = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
                     && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.No.GetHashCode()
                     && u.drlevel_byuser == DRStatus.DR0.GetHashCode()).Count();
@@ -205,6 +237,10 @@ namespace canonapi.Controllers
                     counts.totalOthersFromPredicted = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
                     && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.No.GetHashCode()
                     && u.drlevel_byuser == DRStatus.Others.GetHashCode()).Count();
+
+                    counts.totalUngradableImages = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
+                    && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.No.GetHashCode()
+                    && u.drlevel_byuser == DRStatus.Ungradable.GetHashCode()).Count();
 
                     counts.totalImages = _dbContext.Images.Where(i => i.drlevel_kaggle != i.drlevel_sushrut).Count();
                 }
@@ -213,6 +249,10 @@ namespace canonapi.Controllers
                     counts.totalImagesPredicted = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
                     && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.All.GetHashCode()).Count();
 
+                    counts.totalUngradedImages = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
+                    && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.All.GetHashCode()
+                    && u.drlevel_byuser == DRStatus.Ungraded.GetHashCode()).Count();
+
                     counts.totalDR0FromPredicted = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
                     && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.All.GetHashCode()
                     && u.drlevel_byuser == DRStatus.DR0.GetHashCode()).Count();
@@ -236,6 +276,10 @@ namespace canonapi.Controllers
                     counts.totalOthersFromPredicted = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
                     && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.All.GetHashCode()
                     && u.drlevel_byuser == DRStatus.Others.GetHashCode()).Count();
+
+                    counts.totalUngradableImages = _dbContext.ImageDrByUsers.Where(u => u.userid == userObj.id
+                    && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.All.GetHashCode()
+                    && u.drlevel_byuser == DRStatus.Ungradable.GetHashCode()).Count();
 
                     counts.totalImages = _dbContext.Images.Count();
                 }
@@ -267,9 +311,11 @@ namespace canonapi.Controllers
                 User userObj = _dbContext.Users.SingleOrDefault(u => u.username == username);
 
                 List<CountMaster> counts = new List<CountMaster>();
-                int xKaggleDR0, xKaggleDR1, xKaggleDR2, xKaggleDR3, xKaggleDR4, xKaggleOthers, xSushrutDR0, xSushrutDR1, xSushrutDR2, xSushrutDR3, xSushrutDR4, xSushrutOthers;
+                int xKaggleUngraded, xKaggleDR0, xKaggleDR1, xKaggleDR2, xKaggleDR3, xKaggleDR4, xKaggleOthers, xKaggleUngradable, xSushrutUngraded, xSushrutDR0, xSushrutDR1, xSushrutDR2, xSushrutDR3, xSushrutDR4, xSushrutOthers, xSushrutUngradable;
                 if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.Yes)
                 {
+                    xKaggleUngraded = xSushrutUngraded = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.Ungraded, KaggleAndSushrutMatchedImages.Yes, userObj.id, DataSource.Sushrut);
+
                     xKaggleDR0 = xSushrutDR0 = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.DR0, KaggleAndSushrutMatchedImages.Yes, userObj.id, DataSource.Sushrut);
 
                     xKaggleDR1 = xSushrutDR1 = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.DR1, KaggleAndSushrutMatchedImages.Yes, userObj.id, DataSource.Sushrut);
@@ -282,24 +328,33 @@ namespace canonapi.Controllers
 
                     xKaggleOthers = xSushrutOthers = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.Others, KaggleAndSushrutMatchedImages.Yes, userObj.id, DataSource.Sushrut);
 
+                    xKaggleUngradable = xSushrutUngradable = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.Ungradable, KaggleAndSushrutMatchedImages.Yes, userObj.id, DataSource.Sushrut);
+
                     counts.Add(new CountMaster()
                     {
+                        Kaggle_Ungraded = xKaggleUngraded,
                         Kaggle_DR0 = xKaggleDR0,
                         Kaggle_DR1 = xKaggleDR1,
                         Kaggle_DR2 = xKaggleDR2,
                         Kaggle_DR3 = xKaggleDR3,
                         Kaggle_DR4 = xKaggleDR4,
                         Kaggle_Others = xKaggleOthers,
+                        Kaggle_Ungradable =xKaggleUngradable,
+                        Sushrut_Ungraded = xSushrutUngraded,
                         Sushrut_DR0 = xSushrutDR0,
                         Sushrut_DR1 = xSushrutDR1,
                         Sushrut_DR2 = xSushrutDR2,
                         Sushrut_DR3 = xSushrutDR3,
                         Sushrut_DR4 = xSushrutDR4,
-                        Sushrut_Others = xSushrutOthers
+                        Sushrut_Others = xSushrutOthers,
+                        Sushrut_Ungradable = xSushrutUngradable
                     });
                 }
                 else if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.No)
                 {
+                    xKaggleUngraded = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.Ungraded, KaggleAndSushrutMatchedImages.No, userObj.id, DataSource.Kaggle);
+                    xSushrutUngraded = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.Ungraded, KaggleAndSushrutMatchedImages.No, userObj.id, DataSource.Sushrut);
+
                     xKaggleDR0 = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.DR0, KaggleAndSushrutMatchedImages.No, userObj.id, DataSource.Kaggle);
                     xSushrutDR0 = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.DR0, KaggleAndSushrutMatchedImages.No, userObj.id, DataSource.Sushrut);
 
@@ -318,24 +373,34 @@ namespace canonapi.Controllers
                     xKaggleOthers = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.Others, KaggleAndSushrutMatchedImages.No, userObj.id, DataSource.Kaggle);
                     xSushrutOthers = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.Others, KaggleAndSushrutMatchedImages.No, userObj.id, DataSource.Sushrut);
 
+                    xKaggleUngradable = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.Ungradable, KaggleAndSushrutMatchedImages.No, userObj.id, DataSource.Kaggle);
+                    xSushrutUngradable = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.Ungradable, KaggleAndSushrutMatchedImages.No, userObj.id, DataSource.Sushrut);
+
                     counts.Add(new CountMaster()
                     {
+                        Kaggle_Ungraded = xKaggleUngraded,
                         Kaggle_DR0 = xKaggleDR0,
                         Kaggle_DR1 = xKaggleDR1,
                         Kaggle_DR2 = xKaggleDR2,
                         Kaggle_DR3 = xKaggleDR3,
                         Kaggle_DR4 = xKaggleDR4,
                         Kaggle_Others = xKaggleOthers,
+                        Kaggle_Ungradable = xKaggleUngradable,
+                        Sushrut_Ungraded = xSushrutUngraded,
                         Sushrut_DR0 = xSushrutDR0,
                         Sushrut_DR1 = xSushrutDR1,
                         Sushrut_DR2 = xSushrutDR2,
                         Sushrut_DR3 = xSushrutDR3,
                         Sushrut_DR4 = xSushrutDR4,
-                        Sushrut_Others = xSushrutOthers
+                        Sushrut_Others = xSushrutOthers,
+                        Sushrut_Ungradable = xSushrutUngradable
                     });
                 }
                 else if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.All)
                 {
+                    xKaggleUngraded = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.Ungraded, KaggleAndSushrutMatchedImages.All, userObj.id, DataSource.Kaggle);
+                    xSushrutUngraded = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.Ungraded, KaggleAndSushrutMatchedImages.All, userObj.id, DataSource.Sushrut);
+
                     xKaggleDR0 = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.DR0, KaggleAndSushrutMatchedImages.All, userObj.id, DataSource.Kaggle);
                     xSushrutDR0 = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.DR0, KaggleAndSushrutMatchedImages.All, userObj.id, DataSource.Sushrut);
 
@@ -353,21 +418,28 @@ namespace canonapi.Controllers
 
                     xKaggleOthers = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.Others, KaggleAndSushrutMatchedImages.All, userObj.id, DataSource.Kaggle);
                     xSushrutOthers = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.Others, KaggleAndSushrutMatchedImages.All, userObj.id, DataSource.Sushrut);
+                    
+                    xKaggleUngradable = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.Ungradable, KaggleAndSushrutMatchedImages.All, userObj.id, DataSource.Kaggle);
+                    xSushrutUngradable = new BucketCalculator().CalculateSpecificBucketByPredictionSourceCondition(_dbContext, DRStatus.Ungradable, KaggleAndSushrutMatchedImages.All, userObj.id, DataSource.Sushrut);
 
                     counts.Add(new CountMaster()
                     {
+                        Kaggle_Ungraded = xKaggleUngraded,
                         Kaggle_DR0 = xKaggleDR0,
                         Kaggle_DR1 = xKaggleDR1,
                         Kaggle_DR2 = xKaggleDR2,
                         Kaggle_DR3 = xKaggleDR3,
                         Kaggle_DR4 = xKaggleDR4,
                         Kaggle_Others = xKaggleOthers,
+                        Kaggle_Ungradable = xKaggleUngradable,
+                        Sushrut_Ungraded = xSushrutUngraded,
                         Sushrut_DR0 = xSushrutDR0,
                         Sushrut_DR1 = xSushrutDR1,
                         Sushrut_DR2 = xSushrutDR2,
                         Sushrut_DR3 = xSushrutDR3,
                         Sushrut_DR4 = xSushrutDR4,
-                        Sushrut_Others = xSushrutOthers
+                        Sushrut_Others = xSushrutOthers,
+                        Sushrut_Ungradable = xSushrutUngradable
                     });
                 }
                 SerializedCountResult result = new SerializedCountResult();

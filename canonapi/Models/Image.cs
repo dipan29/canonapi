@@ -53,16 +53,20 @@ namespace canonapi.Models
     {
         public long totalImages { get; set; }
         public long totalImagesPredicted { get; set; }
+        public long totalUngradedImages { get; set; }
         public long totalDR0FromPredicted { get; set; }
         public long totalDR1FromPredicted { get; set; }
         public long totalDR2FromPredicted { get; set; }
         public long totalDR3FromPredicted { get; set; }
         public long totalDR4FromPredicted { get; set; }
         public long totalOthersFromPredicted { get; set; }
+        public long totalUngradableImages { get; set; }
     }
 
     public class CountMaster
     {
+        public decimal Kaggle_Ungraded { get; set; }
+        public decimal Sushrut_Ungraded { get; set; }
         public decimal Kaggle_DR0 { get; set; }
         public decimal Sushrut_DR0 { get; set; }
         public decimal Kaggle_DR1 { get; set; }
@@ -75,6 +79,8 @@ namespace canonapi.Models
         public decimal Sushrut_DR4 { get; set; }
         public decimal Kaggle_Others { get; set; }
         public decimal Sushrut_Others { get; set; }
+        public decimal Kaggle_Ungradable { get; set; }
+        public decimal Sushrut_Ungradable { get; set; }
     }
 
     public class SerializedCountResult
@@ -85,13 +91,15 @@ namespace canonapi.Models
 
     public enum DRStatus
     {
-        All = -1,
+        All = -2,
+        Ungraded = -1,
         DR0 = 0,
         DR1 = 1,
         DR2 = 2,
         DR3 = 3,
         DR4 = 4,
-        Others = 5
+        Others = 5,
+        Ungradable = 6
     }
 
     public enum KaggleAndSushrutMatchedImages
