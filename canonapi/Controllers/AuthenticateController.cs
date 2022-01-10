@@ -33,7 +33,7 @@ namespace canonapi.Controllers
         [ActionName("Login")]
         public IActionResult Login([FromBody] User model)
         {
-            User userObj = _dbContext.Users.SingleOrDefault(user => user.username == model.username
+            User userObj = _dbContext.users.SingleOrDefault(user => user.username == model.username
             && user.userpassword == model.userpassword);
 
             if (userObj != null)

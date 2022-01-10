@@ -6,10 +6,10 @@ namespace canonapi.Authentication
 {
     public class ApplicationDbContext : DbContext
     {
-        public DbSet<User> Users { get; set; }
-        public DbSet<Image> Images { get; set; }
-        public DbSet<Imagebackup> Imagesbackup { get; set; }
-        public DbSet<ImageDrByUser> ImageDrByUsers { get; set; }
+        public DbSet<User> users { get; set; }
+        public DbSet<Image> images { get; set; }
+        public DbSet<Imagebackup> imagesbackup { get; set; }
+        public DbSet<ImageDrByUser> imagedrbyusers { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
