@@ -10,6 +10,8 @@ namespace canonapi.Authentication
         public DbSet<Image> images { get; set; }
         public DbSet<Imagebackup> imagesbackup { get; set; }
         public DbSet<ImageDrByUser> imagedrbyusers { get; set; }
+        public DbSet<Datasets> datasets { get; set; }
+        public DbSet<DatasetMap> datasetmap { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {

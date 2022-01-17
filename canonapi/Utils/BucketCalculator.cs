@@ -7,10 +7,13 @@ using System.Threading.Tasks;
 
 public class BucketCalculator
 {
-    public int CalculateSpecificBucketByCondition(ApplicationDbContext _dbContext, DRStatus dr, KaggleAndSushrutMatchedImages matchingscope, int userid)
+    public int CalculateSpecificBucketByCondition(ApplicationDbContext _dbContext, DRStatus dr, KaggleAndSushrutMatchedImages matchingscope, int userid, string datasetids = null)
     {
         try
         {
+            List<DatasetMap> lstDatasetMap = GetDatasetMapping(_dbContext, userid, datasetids);
+            int[] arrDatasetIds = lstDatasetMap.Select(i => i.datasetid).ToArray();
+
             int totalDRx = default(int);
 
             if (dr == DRStatus.Ungraded)
@@ -19,7 +22,8 @@ public class BucketCalculator
                 {
                     case KaggleAndSushrutMatchedImages.Yes:
                         {
-                            IEnumerable<string> sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle == i.drlevel_sushrut).Select(i => i.imagename).ToList();
+                            IEnumerable<string> sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle == i.drlevel_sushrut
+                                                && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
 
                             IEnumerable<string> userDRxImages = _dbContext.imagedrbyusers.Where(u => u.userid == userid
                                                 && u.kaggle_sushrut_drmatched == matchingscope.GetHashCode()).Select(i => i.imagename).ToList();
@@ -32,7 +36,8 @@ public class BucketCalculator
                         break;
                     case KaggleAndSushrutMatchedImages.No:
                         {
-                            IEnumerable<string> sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle != i.drlevel_sushrut).Select(i => i.imagename).ToList();
+                            IEnumerable<string> sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle != i.drlevel_sushrut
+                                                && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
 
                             IEnumerable<string> userDRxImages = _dbContext.imagedrbyusers.Where(u => u.userid == userid
                                         && u.kaggle_sushrut_drmatched == matchingscope.GetHashCode()).Select(i => i.imagename).ToList();
@@ -45,7 +50,7 @@ public class BucketCalculator
                         break;
                     default:
                         {
-                            IEnumerable<string> sourceDRxImages = _dbContext.images.Select(i => i.imagename).ToList();
+                            IEnumerable<string> sourceDRxImages = _dbContext.images.Where(i => arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
 
                             IEnumerable<string> userDRxImages = _dbContext.imagedrbyusers.Where(u => u.userid == userid).Select(i => i.imagename).ToList();
 
@@ -62,7 +67,7 @@ public class BucketCalculator
                 if (matchingscope == KaggleAndSushrutMatchedImages.Yes)
                 {
                     IEnumerable<string> sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle == i.drlevel_sushrut
-                                && i.drlevel_sushrut == dr.GetHashCode()).Select(i => i.imagename).ToList();
+                                && i.drlevel_sushrut == dr.GetHashCode() && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
                     ///////////////////////////////
                     List<string> sourceDRxImagesCopy = new List<string>();
                     sourceDRxImagesCopy.AddRange(sourceDRxImages);
@@ -93,7 +98,8 @@ public class BucketCalculator
                 else if (matchingscope == KaggleAndSushrutMatchedImages.No)
                 {
                     IEnumerable<string> sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle != i.drlevel_sushrut
-                                && (i.drlevel_sushrut == dr.GetHashCode() || i.drlevel_kaggle == dr.GetHashCode())).Select(i => i.imagename).ToList();
+                                && (i.drlevel_sushrut == dr.GetHashCode() || i.drlevel_kaggle == dr.GetHashCode())
+                                && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
                     ///////////////////////////////
                     List<string> sourceDRxImagesCopy = new List<string>();
                     sourceDRxImagesCopy.AddRange(sourceDRxImages);
@@ -124,7 +130,7 @@ public class BucketCalculator
                 else
                 {
                     IEnumerable<string> sourceDRxImages = _dbContext.images.Where(i => i.drlevel_sushrut == dr.GetHashCode()
-                    || i.drlevel_kaggle == dr.GetHashCode()).Select(i => i.imagename).ToList();
+                    || i.drlevel_kaggle == dr.GetHashCode() && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
                     ///////////////////////////////
                     List<string> sourceDRxImagesCopy = new List<string>();
                     sourceDRxImagesCopy.AddRange(sourceDRxImages);
@@ -159,11 +165,14 @@ public class BucketCalculator
         }
     }
 
-    public int CalculateSpecificBucketByPredictionSourceCondition(ApplicationDbContext _dbContext, DRStatus dr, KaggleAndSushrutMatchedImages matchingscope, int userid, DataSource source = DataSource.Both)
+    public int CalculateSpecificBucketByPredictionSourceCondition(ApplicationDbContext _dbContext, DRStatus dr, KaggleAndSushrutMatchedImages matchingscope, int userid, DataSource source = DataSource.Both, string datasetids = null)
     {
         int totalDRx = default(int);
         try
         {
+            List<DatasetMap> lstDatasetMap = GetDatasetMapping(_dbContext, userid, datasetids);
+            int[] arrDatasetIds = lstDatasetMap.Select(i => i.datasetid).ToArray();
+
             if (dr == DRStatus.Ungraded)
             {
                 switch (matchingscope)
@@ -171,7 +180,8 @@ public class BucketCalculator
                     case KaggleAndSushrutMatchedImages.Yes:
                         {
                             IEnumerable<string> sourceDRxImages = new List<string>();
-                            sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle == i.drlevel_sushrut).Select(i => i.imagename).ToList();
+                            sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle == i.drlevel_sushrut
+                            && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
 
                             IEnumerable<string> userDRxImages = _dbContext.imagedrbyusers.Where(u => u.userid == userid
                                         && u.kaggle_sushrut_drmatched == matchingscope.GetHashCode()).Select(i => i.imagename).ToList();
@@ -185,7 +195,8 @@ public class BucketCalculator
                     case KaggleAndSushrutMatchedImages.No:
                         {
                             IEnumerable<string> sourceDRxImages = new List<string>();
-                            sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle != i.drlevel_sushrut).Select(i => i.imagename).ToList();
+                            sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle != i.drlevel_sushrut
+                            && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
 
                             IEnumerable<string> userDRxImages = _dbContext.imagedrbyusers.Where(u => u.userid == userid
                                         && u.kaggle_sushrut_drmatched == matchingscope.GetHashCode()).Select(i => i.imagename).ToList();
@@ -199,7 +210,7 @@ public class BucketCalculator
                     default:
                         {
                             IEnumerable<string> sourceDRxImages = new List<string>();
-                            sourceDRxImages = _dbContext.images.Select(i => i.imagename).ToList();
+                            sourceDRxImages = _dbContext.images.Where(i => arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
 
                             IEnumerable<string> userDRxImages = _dbContext.imagedrbyusers.Where(u => u.userid == userid).Select(i => i.imagename).ToList();
 
@@ -221,19 +232,19 @@ public class BucketCalculator
                         case DataSource.Kaggle:
                             {
                                 sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle == i.drlevel_sushrut
-                                && i.drlevel_kaggle == dr.GetHashCode()).Select(i => i.imagename).ToList();
+                                && i.drlevel_kaggle == dr.GetHashCode() && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
                                 break;
                             }
                         case DataSource.Sushrut:
                             {
                                 sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle == i.drlevel_sushrut
-                                && i.drlevel_sushrut == dr.GetHashCode()).Select(i => i.imagename).ToList();
+                                && i.drlevel_sushrut == dr.GetHashCode() && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
                                 break;
                             }
                         default:
                             {
                                 sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle == i.drlevel_sushrut
-                                && i.drlevel_sushrut == dr.GetHashCode()).Select(i => i.imagename).ToList();
+                                && i.drlevel_sushrut == dr.GetHashCode() && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
                                 break;
                             }
                     }
@@ -272,19 +283,20 @@ public class BucketCalculator
                         case DataSource.Kaggle:
                             {
                                 sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle != i.drlevel_sushrut
-                                && i.drlevel_kaggle == dr.GetHashCode()).Select(i => i.imagename).ToList();
+                                && i.drlevel_kaggle == dr.GetHashCode() && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
                                 break;
                             }
                         case DataSource.Sushrut:
                             {
                                 sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle != i.drlevel_sushrut
-                                && i.drlevel_sushrut == dr.GetHashCode()).Select(i => i.imagename).ToList();
+                                && i.drlevel_sushrut == dr.GetHashCode() && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
                                 break;
                             }
                         default:
                             {
                                 sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle != i.drlevel_sushrut
-                                && (i.drlevel_sushrut == dr.GetHashCode() || i.drlevel_kaggle == dr.GetHashCode())).Select(i => i.imagename).ToList();
+                                && (i.drlevel_sushrut == dr.GetHashCode() || i.drlevel_kaggle == dr.GetHashCode())
+                                && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
                                 break;
                             }
                     }
@@ -322,18 +334,20 @@ public class BucketCalculator
                     {
                         case DataSource.Kaggle:
                             {
-                                sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle == dr.GetHashCode()).Select(i => i.imagename).ToList();
+                                sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle == dr.GetHashCode()
+                                && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
                                 break;
                             }
                         case DataSource.Sushrut:
                             {
-                                sourceDRxImages = _dbContext.images.Where(i => i.drlevel_sushrut == dr.GetHashCode()).Select(i => i.imagename).ToList();
+                                sourceDRxImages = _dbContext.images.Where(i => i.drlevel_sushrut == dr.GetHashCode()
+                                && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
                                 break;
                             }
                         default:
                             {
                                 sourceDRxImages = _dbContext.images.Where(i => i.drlevel_sushrut == dr.GetHashCode()
-                                || i.drlevel_kaggle == dr.GetHashCode()).Select(i => i.imagename).ToList();
+                                || i.drlevel_kaggle == dr.GetHashCode() && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
                                 break;
                             }
                     }
@@ -371,11 +385,14 @@ public class BucketCalculator
         }
     }
 
-    public IEnumerable<long> GetAllIdsForSpecificBucketByPredictionSourceCondition(ApplicationDbContext _dbContext, DRStatus dr, KaggleAndSushrutMatchedImages matchingscope, int userid, DataSource source = DataSource.Both)
+    public IEnumerable<long> GetAllIdsForSpecificBucketByPredictionSourceCondition(ApplicationDbContext _dbContext, DRStatus dr, KaggleAndSushrutMatchedImages matchingscope, int userid, DataSource source = DataSource.Both, string datasetids = null)
     {
         IEnumerable<long> DRxIds = new List<long>();
         try
         {
+            List<DatasetMap> lstDatasetMap = GetDatasetMapping(_dbContext, userid, datasetids);
+            int[] arrDatasetIds = lstDatasetMap.Select(i => i.datasetid).ToArray();
+
             if (dr == DRStatus.Ungraded)
             {
                 switch (matchingscope)
@@ -383,7 +400,8 @@ public class BucketCalculator
                     case KaggleAndSushrutMatchedImages.Yes:
                         {
                             IEnumerable<string> sourceDRxImages = new List<string>();
-                            sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle == i.drlevel_sushrut).Select(i => i.imagename).ToList();
+                            sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle == i.drlevel_sushrut
+                                        && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
 
                             IEnumerable<string> userDRxImages = _dbContext.imagedrbyusers.Where(u => u.userid == userid
                                         && u.kaggle_sushrut_drmatched == matchingscope.GetHashCode()).Select(i => i.imagename).ToList();
@@ -397,7 +415,8 @@ public class BucketCalculator
                     case KaggleAndSushrutMatchedImages.No:
                         {
                             IEnumerable<string> sourceDRxImages = new List<string>();
-                            sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle != i.drlevel_sushrut).Select(i => i.imagename).ToList();
+                            sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle != i.drlevel_sushrut
+                                        && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
 
                             IEnumerable<string> userDRxImages = _dbContext.imagedrbyusers.Where(u => u.userid == userid
                                         && u.kaggle_sushrut_drmatched == matchingscope.GetHashCode()).Select(i => i.imagename).ToList();
@@ -411,7 +430,7 @@ public class BucketCalculator
                     default:
                         {
                             IEnumerable<string> sourceDRxImages = new List<string>();
-                            sourceDRxImages = _dbContext.images.Select(i => i.imagename).ToList();
+                            sourceDRxImages = _dbContext.images.Where(i => arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
 
                             IEnumerable<string> userDRxImages = _dbContext.imagedrbyusers.Where(u => u.userid == userid).Select(i => i.imagename).ToList();
 
@@ -425,212 +444,237 @@ public class BucketCalculator
             }
             else
             {
-            if (matchingscope == KaggleAndSushrutMatchedImages.Yes)
-            {
-                IEnumerable<string> sourceDRxImages = new List<string>();
-                switch (source)
+                if (matchingscope == KaggleAndSushrutMatchedImages.Yes)
                 {
-                    case DataSource.Kaggle:
-                        {
-                            sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle == i.drlevel_sushrut
-                            && i.drlevel_kaggle == dr.GetHashCode()).Select(i => i.imagename).ToList();
-                            break;
-                        }
-                    case DataSource.Sushrut:
-                        {
-                            sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle == i.drlevel_sushrut
-                            && i.drlevel_sushrut == dr.GetHashCode()).Select(i => i.imagename).ToList();
-                            break;
-                        }
-                    default:
-                        {
-                            sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle == i.drlevel_sushrut
-                            && i.drlevel_sushrut == dr.GetHashCode()).Select(i => i.imagename).ToList();
-                            break;
-                        }
+                    IEnumerable<string> sourceDRxImages = new List<string>();
+                    switch (source)
+                    {
+                        case DataSource.Kaggle:
+                            {
+                                sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle == i.drlevel_sushrut
+                                && i.drlevel_kaggle == dr.GetHashCode() && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
+                                break;
+                            }
+                        case DataSource.Sushrut:
+                            {
+                                sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle == i.drlevel_sushrut
+                                && i.drlevel_sushrut == dr.GetHashCode() && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
+                                break;
+                            }
+                        default:
+                            {
+                                sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle == i.drlevel_sushrut
+                                && i.drlevel_sushrut == dr.GetHashCode() && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
+                                break;
+                            }
+                    }
+                    ///////////////////////////////
+                    List<string> sourceDRxImagesCopy = new List<string>();
+                    sourceDRxImagesCopy.AddRange(sourceDRxImages);
+
+                    IEnumerable<string> userDRxImages = _dbContext.imagedrbyusers.Where(u => u.userid == userid
+                    && u.kaggle_sushrut_drmatched == matchingscope.GetHashCode()
+                    && u.drlevel_byuser == dr.GetHashCode()).Select(i => i.imagename).ToList();
+                    ///////////////////////////////
+                    List<string> userDRxImagesCopy = new List<string>();
+                    userDRxImagesCopy.AddRange(userDRxImages);
+
+                    IEnumerable<string> userNotDRxImages = _dbContext.imagedrbyusers.Where(u => u.userid == userid
+                    && u.kaggle_sushrut_drmatched == matchingscope.GetHashCode()
+                    && u.drlevel_byuser != dr.GetHashCode()).Select(i => i.imagename).ToList();
+                    ///////////////////////////////
+                    List<string> userNotDRxImagesCopy = new List<string>();
+                    userNotDRxImagesCopy.AddRange(userNotDRxImages);
+
+                    //Getting uncommon DRx
+                    userDRxImagesCopy.RemoveAll(x => sourceDRxImagesCopy.Exists(y => y == x));
+                    //Getting common plus remain DRx from source bucket
+                    IEnumerable<string> newDRx = sourceDRxImages.Union(userDRxImages);
+                    //Getting the final list
+                    IEnumerable<string> newDRxMainMinusUncommon = newDRx.ToList().Where(f => !userNotDRxImagesCopy.Contains(f));
+                    //Get Ids by condition
+                    switch (source)
+                    {
+                        case DataSource.Kaggle:
+                            {
+                                DRxIds = _dbContext.images.Where(i => newDRxMainMinusUncommon.Contains(i.imagename)).Select(i => i.id).ToList();
+                                break;
+                            }
+                        case DataSource.Sushrut:
+                            {
+                                DRxIds = _dbContext.images.Where(i => newDRxMainMinusUncommon.Contains(i.imagename)).Select(i => i.id).ToList();
+                                break;
+                            }
+                        default:
+                            {
+                                DRxIds = _dbContext.images.Where(i => newDRxMainMinusUncommon.Contains(i.imagename)).Select(i => i.id).ToList();
+                                break;
+                            }
+                    }
                 }
-                ///////////////////////////////
-                List<string> sourceDRxImagesCopy = new List<string>();
-                sourceDRxImagesCopy.AddRange(sourceDRxImages);
-
-                IEnumerable<string> userDRxImages = _dbContext.imagedrbyusers.Where(u => u.userid == userid
-                && u.kaggle_sushrut_drmatched == matchingscope.GetHashCode()
-                && u.drlevel_byuser == dr.GetHashCode()).Select(i => i.imagename).ToList();
-                ///////////////////////////////
-                List<string> userDRxImagesCopy = new List<string>();
-                userDRxImagesCopy.AddRange(userDRxImages);
-
-                IEnumerable<string> userNotDRxImages = _dbContext.imagedrbyusers.Where(u => u.userid == userid
-                && u.kaggle_sushrut_drmatched == matchingscope.GetHashCode()
-                && u.drlevel_byuser != dr.GetHashCode()).Select(i => i.imagename).ToList();
-                ///////////////////////////////
-                List<string> userNotDRxImagesCopy = new List<string>();
-                userNotDRxImagesCopy.AddRange(userNotDRxImages);
-
-                //Getting uncommon DRx
-                userDRxImagesCopy.RemoveAll(x => sourceDRxImagesCopy.Exists(y => y == x));
-                //Getting common plus remain DRx from source bucket
-                IEnumerable<string> newDRx = sourceDRxImages.Union(userDRxImages);
-                //Getting the final list
-                IEnumerable<string> newDRxMainMinusUncommon = newDRx.ToList().Where(f => !userNotDRxImagesCopy.Contains(f));
-                //Get Ids by condition
-                switch (source)
+                else if (matchingscope == KaggleAndSushrutMatchedImages.No)
                 {
-                    case DataSource.Kaggle:
-                        {
-                            DRxIds = _dbContext.images.Where(i => newDRxMainMinusUncommon.Contains(i.imagename)).Select(i => i.id).ToList();
-                            break;
-                        }
-                    case DataSource.Sushrut:
-                        {
-                            DRxIds = _dbContext.images.Where(i => newDRxMainMinusUncommon.Contains(i.imagename)).Select(i => i.id).ToList();
-                            break;
-                        }
-                    default:
-                        {
-                            DRxIds = _dbContext.images.Where(i => newDRxMainMinusUncommon.Contains(i.imagename)).Select(i => i.id).ToList();
-                            break;
-                        }
+                    IEnumerable<string> sourceDRxImages = new List<string>();
+                    switch (source)
+                    {
+                        case DataSource.Kaggle:
+                            {
+                                sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle != i.drlevel_sushrut
+                                && i.drlevel_kaggle == dr.GetHashCode() && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
+                                break;
+                            }
+                        case DataSource.Sushrut:
+                            {
+                                sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle != i.drlevel_sushrut
+                                && i.drlevel_sushrut == dr.GetHashCode() && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
+                                break;
+                            }
+                        default:
+                            {
+                                sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle != i.drlevel_sushrut
+                                && (i.drlevel_sushrut == dr.GetHashCode() || i.drlevel_kaggle == dr.GetHashCode())
+                                && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
+                                break;
+                            }
+                    }
+                    ///////////////////////////////
+                    List<string> sourceDRxImagesCopy = new List<string>();
+                    sourceDRxImagesCopy.AddRange(sourceDRxImages);
+
+                    IEnumerable<string> userDRxImages = _dbContext.imagedrbyusers.Where(u => u.userid == userid
+                    && u.kaggle_sushrut_drmatched == matchingscope.GetHashCode()
+                    && u.drlevel_byuser == dr.GetHashCode()).Select(i => i.imagename).ToList();
+                    ///////////////////////////////
+                    List<string> userDRxImagesCopy = new List<string>();
+                    userDRxImagesCopy.AddRange(userDRxImages);
+
+                    IEnumerable<string> userNotDRxImages = _dbContext.imagedrbyusers.Where(u => u.userid == userid
+                    && u.kaggle_sushrut_drmatched == matchingscope.GetHashCode()
+                    && u.drlevel_byuser != dr.GetHashCode()).Select(i => i.imagename).ToList();
+                    ///////////////////////////////
+                    List<string> userNotDRxImagesCopy = new List<string>();
+                    userNotDRxImagesCopy.AddRange(userNotDRxImages);
+
+                    //Getting uncommon DRx
+                    userDRxImagesCopy.RemoveAll(x => sourceDRxImagesCopy.Exists(y => y == x));
+                    //Getting common plus remain DRx from source bucket
+                    IEnumerable<string> newDRx = sourceDRxImages.Union(userDRxImages);
+                    //Getting the final list
+                    IEnumerable<string> newDRxMainMinusUncommon = newDRx.ToList().Where(f => !userNotDRxImagesCopy.Contains(f));
+                    //Get Ids by condition
+                    switch (source)
+                    {
+                        case DataSource.Kaggle:
+                            {
+                                DRxIds = _dbContext.images.Where(i => newDRxMainMinusUncommon.Contains(i.imagename)).Select(i => i.id).ToList();
+                                break;
+                            }
+                        case DataSource.Sushrut:
+                            {
+                                DRxIds = _dbContext.images.Where(i => newDRxMainMinusUncommon.Contains(i.imagename)).Select(i => i.id).ToList();
+                                break;
+                            }
+                        default:
+                            {
+                                DRxIds = _dbContext.images.Where(i => newDRxMainMinusUncommon.Contains(i.imagename)).Select(i => i.id).ToList();
+                                break;
+                            }
+                    }
                 }
-            }
-            else if (matchingscope == KaggleAndSushrutMatchedImages.No)
-            {
-                IEnumerable<string> sourceDRxImages = new List<string>();
-                switch (source)
+                else
                 {
-                    case DataSource.Kaggle:
-                        {
-                            sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle != i.drlevel_sushrut
-                            && i.drlevel_kaggle == dr.GetHashCode()).Select(i => i.imagename).ToList();
-                            break;
-                        }
-                    case DataSource.Sushrut:
-                        {
-                            sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle != i.drlevel_sushrut
-                            && i.drlevel_sushrut == dr.GetHashCode()).Select(i => i.imagename).ToList();
-                            break;
-                        }
-                    default:
-                        {
-                            sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle != i.drlevel_sushrut
-                            && (i.drlevel_sushrut == dr.GetHashCode() || i.drlevel_kaggle == dr.GetHashCode())).Select(i => i.imagename).ToList();
-                            break;
-                        }
+                    IEnumerable<string> sourceDRxImages = new List<string>();
+                    switch (source)
+                    {
+                        case DataSource.Kaggle:
+                            {
+                                sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle == dr.GetHashCode()
+                                && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
+                                break;
+                            }
+                        case DataSource.Sushrut:
+                            {
+                                sourceDRxImages = _dbContext.images.Where(i => i.drlevel_sushrut == dr.GetHashCode()
+                                && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
+                                break;
+                            }
+                        default:
+                            {
+                                sourceDRxImages = _dbContext.images.Where(i => i.drlevel_sushrut == dr.GetHashCode()
+                                || i.drlevel_kaggle == dr.GetHashCode() && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
+                                break;
+                            }
+                    }
+                    ///////////////////////////////
+                    List<string> sourceDRxImagesCopy = new List<string>();
+                    sourceDRxImagesCopy.AddRange(sourceDRxImages);
+
+                    IEnumerable<string> userDRxImages = _dbContext.imagedrbyusers.Where(u => u.userid == userid
+                    && u.drlevel_byuser == dr.GetHashCode()).Select(i => i.imagename).ToList();
+                    ///////////////////////////////
+                    List<string> userDRxImagesCopy = new List<string>();
+                    userDRxImagesCopy.AddRange(userDRxImages);
+
+                    IEnumerable<string> userNotDRxImages = _dbContext.imagedrbyusers.Where(u => u.userid == userid
+                    && u.drlevel_byuser != dr.GetHashCode()).Select(i => i.imagename).ToList();
+                    ///////////////////////////////
+                    List<string> userNotDRxImagesCopy = new List<string>();
+                    userNotDRxImagesCopy.AddRange(userNotDRxImages);
+
+                    //Getting uncommon DRx
+                    userDRxImagesCopy.RemoveAll(x => sourceDRxImagesCopy.Exists(y => y == x));
+                    //Getting common plus remain DRx from source bucket
+                    IEnumerable<string> newDRx = sourceDRxImages.Union(userDRxImages);
+                    //Getting the final list
+                    IEnumerable<string> newDRxMainMinusUncommon = newDRx.ToList().Where(f => !userNotDRxImagesCopy.Contains(f));
+                    //Get Ids by condition
+                    switch (source)
+                    {
+                        case DataSource.Kaggle:
+                            {
+                                DRxIds = _dbContext.images.Where(i => newDRxMainMinusUncommon.Contains(i.imagename)).Select(i => i.id).ToList();
+                                break;
+                            }
+                        case DataSource.Sushrut:
+                            {
+                                DRxIds = _dbContext.images.Where(i => newDRxMainMinusUncommon.Contains(i.imagename)).Select(i => i.id).ToList();
+                                break;
+                            }
+                        default:
+                            {
+                                DRxIds = _dbContext.images.Where(i => newDRxMainMinusUncommon.Contains(i.imagename)).Select(i => i.id).ToList();
+                                break;
+                            }
+                    }
                 }
-                ///////////////////////////////
-                List<string> sourceDRxImagesCopy = new List<string>();
-                sourceDRxImagesCopy.AddRange(sourceDRxImages);
-
-                IEnumerable<string> userDRxImages = _dbContext.imagedrbyusers.Where(u => u.userid == userid
-                && u.kaggle_sushrut_drmatched == matchingscope.GetHashCode()
-                && u.drlevel_byuser == dr.GetHashCode()).Select(i => i.imagename).ToList();
-                ///////////////////////////////
-                List<string> userDRxImagesCopy = new List<string>();
-                userDRxImagesCopy.AddRange(userDRxImages);
-
-                IEnumerable<string> userNotDRxImages = _dbContext.imagedrbyusers.Where(u => u.userid == userid
-                && u.kaggle_sushrut_drmatched == matchingscope.GetHashCode()
-                && u.drlevel_byuser != dr.GetHashCode()).Select(i => i.imagename).ToList();
-                ///////////////////////////////
-                List<string> userNotDRxImagesCopy = new List<string>();
-                userNotDRxImagesCopy.AddRange(userNotDRxImages);
-
-                //Getting uncommon DRx
-                userDRxImagesCopy.RemoveAll(x => sourceDRxImagesCopy.Exists(y => y == x));
-                //Getting common plus remain DRx from source bucket
-                IEnumerable<string> newDRx = sourceDRxImages.Union(userDRxImages);
-                //Getting the final list
-                IEnumerable<string> newDRxMainMinusUncommon = newDRx.ToList().Where(f => !userNotDRxImagesCopy.Contains(f));
-                //Get Ids by condition
-                switch (source)
-                {
-                    case DataSource.Kaggle:
-                        {
-                            DRxIds = _dbContext.images.Where(i => newDRxMainMinusUncommon.Contains(i.imagename)).Select(i => i.id).ToList();
-                            break;
-                        }
-                    case DataSource.Sushrut:
-                        {
-                            DRxIds = _dbContext.images.Where(i => newDRxMainMinusUncommon.Contains(i.imagename)).Select(i => i.id).ToList();
-                            break;
-                        }
-                    default:
-                        {
-                            DRxIds = _dbContext.images.Where(i => newDRxMainMinusUncommon.Contains(i.imagename)).Select(i => i.id).ToList();
-                            break;
-                        }
-                }
-            }
-            else
-            {
-                IEnumerable<string> sourceDRxImages = new List<string>();
-                switch (source)
-                {
-                    case DataSource.Kaggle:
-                        {
-                            sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle == dr.GetHashCode()).Select(i => i.imagename).ToList();
-                            break;
-                        }
-                    case DataSource.Sushrut:
-                        {
-                            sourceDRxImages = _dbContext.images.Where(i => i.drlevel_sushrut == dr.GetHashCode()).Select(i => i.imagename).ToList();
-                            break;
-                        }
-                    default:
-                        {
-                            sourceDRxImages = _dbContext.images.Where(i => i.drlevel_sushrut == dr.GetHashCode()
-                            || i.drlevel_kaggle == dr.GetHashCode()).Select(i => i.imagename).ToList();
-                            break;
-                        }
-                }
-                ///////////////////////////////
-                List<string> sourceDRxImagesCopy = new List<string>();
-                sourceDRxImagesCopy.AddRange(sourceDRxImages);
-
-                IEnumerable<string> userDRxImages = _dbContext.imagedrbyusers.Where(u => u.userid == userid
-                && u.drlevel_byuser == dr.GetHashCode()).Select(i => i.imagename).ToList();
-                ///////////////////////////////
-                List<string> userDRxImagesCopy = new List<string>();
-                userDRxImagesCopy.AddRange(userDRxImages);
-
-                IEnumerable<string> userNotDRxImages = _dbContext.imagedrbyusers.Where(u => u.userid == userid
-                && u.drlevel_byuser != dr.GetHashCode()).Select(i => i.imagename).ToList();
-                ///////////////////////////////
-                List<string> userNotDRxImagesCopy = new List<string>();
-                userNotDRxImagesCopy.AddRange(userNotDRxImages);
-
-                //Getting uncommon DRx
-                userDRxImagesCopy.RemoveAll(x => sourceDRxImagesCopy.Exists(y => y == x));
-                //Getting common plus remain DRx from source bucket
-                IEnumerable<string> newDRx = sourceDRxImages.Union(userDRxImages);
-                //Getting the final list
-                IEnumerable<string> newDRxMainMinusUncommon = newDRx.ToList().Where(f => !userNotDRxImagesCopy.Contains(f));
-                //Get Ids by condition
-                switch (source)
-                {
-                    case DataSource.Kaggle:
-                        {
-                            DRxIds = _dbContext.images.Where(i => newDRxMainMinusUncommon.Contains(i.imagename)).Select(i => i.id).ToList();
-                            break;
-                        }
-                    case DataSource.Sushrut:
-                        {
-                            DRxIds = _dbContext.images.Where(i => newDRxMainMinusUncommon.Contains(i.imagename)).Select(i => i.id).ToList();
-                            break;
-                        }
-                    default:
-                        {
-                            DRxIds = _dbContext.images.Where(i => newDRxMainMinusUncommon.Contains(i.imagename)).Select(i => i.id).ToList();
-                            break;
-                        }
-                }
-            }
             }
             return DRxIds;
         }
         catch (Exception ex)
         {
             return new List<long>();
+        }
+    }
+
+    public List<DatasetMap> GetDatasetMapping(ApplicationDbContext _dbContext, int userid, string datasetids = null)
+    {
+        try
+        {
+            List<DatasetMap> objDatasetMap = null;
+            if (String.IsNullOrEmpty(datasetids))
+            {
+                objDatasetMap = _dbContext.datasetmap.Where(i => i.userid == userid).ToList();
+            }
+            else
+            {
+                string[] arrDatasetIds = datasetids.Trim().Split(',');
+                objDatasetMap = _dbContext.datasetmap.Where(i => i.userid == userid && arrDatasetIds.Contains(i.datasetid.ToString())).ToList();
+            }
+            return objDatasetMap;
+        }
+        catch (Exception ex)
+        {
+            return null;
         }
     }
 }

@@ -269,7 +269,6 @@ C:\Source Code\canonapi\canonapi\bin\Debug\netcoreapp3.1\runtimes\win\native\sna
 C:\Source Code\canonapi\canonapi\bin\Debug\netcoreapp3.1\runtimes\linux\native\libmongocrypt.so
 C:\Source Code\canonapi\canonapi\bin\Debug\netcoreapp3.1\runtimes\osx\native\libmongocrypt.dylib
 C:\Source Code\canonapi\canonapi\bin\Debug\netcoreapp3.1\runtimes\win\native\mongocrypt.dll
-C:\Source Code\canonapi\canonapi\obj\Debug\netcoreapp3.1\canonapi.csproj.AssemblyReference.cache
 C:\Source Code\canonapi\canonapi\obj\Debug\netcoreapp3.1\canonapi.GeneratedMSBuildEditorConfig.editorconfig
 C:\Source Code\canonapi\canonapi\obj\Debug\netcoreapp3.1\canonapi.AssemblyInfoInputs.cache
 C:\Source Code\canonapi\canonapi\obj\Debug\netcoreapp3.1\canonapi.AssemblyInfo.cs

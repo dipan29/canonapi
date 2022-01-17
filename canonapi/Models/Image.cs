@@ -9,6 +9,7 @@ namespace canonapi.Models
         public int drlevel_kaggle { get; set; }
         public int drlevel_sushrut { get; set; }
         public string imageurl { get; set; }
+        public int datasetid { get; set; }
     }
 
     public class Imagebackup
