@@ -49,11 +49,12 @@ namespace canonapi.Controllers
                     _dbContext.datasets.Add(objSource);
                     _dbContext.SaveChanges();
 
-                    DatasetMap objDatasetMap = new DatasetMap() { 
-                        id = 0, 
-                        userid = objUser.id, 
-                        datasetid = _dbContext.datasets.Where(d => d.datasetname == objSource.datasetname).Select(d => d.id).FirstOrDefault(), 
-                        isadmin = true 
+                    DatasetMap objDatasetMap = new DatasetMap()
+                    {
+                        id = 0,
+                        userid = objUser.id,
+                        datasetid = _dbContext.datasets.Where(d => d.datasetname == objSource.datasetname).Select(d => d.id).FirstOrDefault(),
+                        isadmin = true
                     };
                     _dbContext.datasetmap.Add(objDatasetMap);
                     _dbContext.SaveChanges();
@@ -170,6 +171,37 @@ namespace canonapi.Controllers
                         message = "No matching dataset found"
                     });
                 }
+            }
+            catch (Exception ex)
+            {
+                return Ok(new
+                {
+                    success = default(int),
+                    message = "Exception has been detected. Please contact to the authority."
+                });
+            }
+        }
+
+        [HttpGet]
+        [ActionName("GetAllDatasets")]
+        public IActionResult GetAllDatasets()
+        {
+            try
+            {
+                if (!GetUser().admin)
+                {
+                    return Ok(new
+                    {
+                        success = default(int),
+                        message = "User does not have enough rights"
+                    });
+                }
+
+                return Ok(new
+                {
+                    success = 1,
+                    data = _dbContext.datasets.ToList()
+                });
             }
             catch (Exception ex)
             {
