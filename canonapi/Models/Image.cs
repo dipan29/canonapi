@@ -10,6 +10,7 @@ namespace canonapi.Models
         public int drlevel_sushrut { get; set; }
         public string imageurl { get; set; }
         public int datasetid { get; set; }
+        public string location { get; set; }
     }
 
     public class Imagebackup

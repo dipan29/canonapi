@@ -801,19 +801,19 @@ namespace canonapi.Controllers
                 {
                     string qryPart = dr != DRStatus.All ? string.Format(" AND iu.kaggle_sushrut_drmatched = 1", dr.GetHashCode()) : string.Empty;
                     //qry = string.Format("SELECT i.id FROM images i WHERE i.imagename = (SELECT iu.imagename FROM imagedrbyusers iu WHERE iu.userid = {0} AND iu.drlevel_byuser = {1}{2} ORDER BY iu.createdon DESC LIMIT 1);", userObj.id, dr.GetHashCode(), qryPart);
-                    qry = string.Format("SELECT i.id from FROM images i INNER JOIN imagedrbyusers iu ON i.imagename = iu.imagename WHERE iu.userid = {0} AND iu.drlevel_byuser = {1}{2}{3} ORDER BY iu.createdon DESC LIMIT 1;", userObj.id, dr.GetHashCode(), qryPart, strQueryDataset);
+                    qry = string.Format("SELECT i.id FROM images i INNER JOIN imagedrbyusers iu ON i.imagename = iu.imagename WHERE iu.userid = {0} AND iu.drlevel_byuser = {1}{2}{3} ORDER BY iu.createdon DESC LIMIT 1;", userObj.id, dr.GetHashCode(), qryPart, strQueryDataset);
                 }
                 else if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.No)
                 {
                     string qryPart = dr != DRStatus.All ? string.Format(" AND iu.kaggle_sushrut_drmatched = 0", dr.GetHashCode()) : string.Empty;
                     //qry = string.Format("SELECT i.id FROM images i WHERE i.imagename = (SELECT iu.imagename FROM imagedrbyusers iu WHERE iu.userid = {0} AND iu.drlevel_byuser = {1}{2} ORDER BY iu.createdon DESC LIMIT 1);", userObj.id, dr.GetHashCode(), qryPart);
-                    qry = string.Format("SELECT i.id from FROM images i INNER JOIN imagedrbyusers iu ON i.imagename = iu.imagename WHERE iu.userid = {0} AND iu.drlevel_byuser = {1}{2}{3} ORDER BY iu.createdon DESC LIMIT 1;", userObj.id, dr.GetHashCode(), qryPart, strQueryDataset);
+                    qry = string.Format("SELECT i.id FROM images i INNER JOIN imagedrbyusers iu ON i.imagename = iu.imagename WHERE iu.userid = {0} AND iu.drlevel_byuser = {1}{2}{3} ORDER BY iu.createdon DESC LIMIT 1;", userObj.id, dr.GetHashCode(), qryPart, strQueryDataset);
                 }
                 else if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.All)
                 {
                     string qryPart = string.Empty;
                     //qry = string.Format("SELECT i.id FROM images i WHERE i.imagename = (SELECT iu.imagename FROM imagedrbyusers iu WHERE iu.userid = {0} AND iu.drlevel_byuser = {1}{2} ORDER BY iu.createdon DESC LIMIT 1);", userObj.id, dr.GetHashCode(), qryPart);
-                    qry = string.Format("SELECT i.id from FROM images i INNER JOIN imagedrbyusers iu ON i.imagename = iu.imagename WHERE iu.userid = {0} AND iu.drlevel_byuser = {1}{2}{3} ORDER BY iu.createdon DESC LIMIT 1;", userObj.id, dr.GetHashCode(), qryPart, strQueryDataset);
+                    qry = string.Format("SELECT i.id FROM images i INNER JOIN imagedrbyusers iu ON i.imagename = iu.imagename WHERE iu.userid = {0} AND iu.drlevel_byuser = {1}{2}{3} ORDER BY iu.createdon DESC LIMIT 1;", userObj.id, dr.GetHashCode(), qryPart, strQueryDataset);
                 }
                 ids = _dbContext.ExecuteQuery<ImageOutIds>(qry);
 

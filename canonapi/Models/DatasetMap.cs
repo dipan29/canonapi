@@ -11,5 +11,6 @@ namespace canonapi.Models
         public int userid { get; set; }
         public int datasetid { get; set; }
         public bool isadmin { get; set; }
+        public bool isanonymous { get; set; }
     }
 }

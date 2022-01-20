@@ -42,7 +42,8 @@ namespace canonapi.Controllers
                 }
                 if (objSource != null)
                 {
-                    if (String.IsNullOrEmpty(objSource.adminid))
+                    int adminid = -1;
+                    if (String.IsNullOrEmpty(objSource.adminid) || !Int32.TryParse(objSource.adminid, out adminid))
                     {
                         objSource.adminid = objUser.id.ToString();
                     }
@@ -52,7 +53,7 @@ namespace canonapi.Controllers
                     DatasetMap objDatasetMap = new DatasetMap()
                     {
                         id = 0,
-                        userid = objUser.id,
+                        userid = adminid > 0 ? adminid : objUser.id,
                         datasetid = _dbContext.datasets.Where(d => d.datasetname == objSource.datasetname).Select(d => d.id).FirstOrDefault(),
                         isadmin = true
                     };
@@ -78,7 +79,7 @@ namespace canonapi.Controllers
 
         [HttpPost]
         [ActionName("UpdateDataset")]
-        public IActionResult UpdateDataset([FromBody] Datasets objs)
+        public IActionResult UpdateDataset([FromBody] Datasets objInput)
         {
             try
             {
@@ -90,20 +91,46 @@ namespace canonapi.Controllers
                         message = "User does not have enough rights"
                     });
                 }
-                if (objs != null)
+                if (objInput != null)
                 {
-                    Datasets objds = null;
-                    objds = _dbContext.datasets.Where(d => d.datasetname == objs.datasetname).FirstOrDefault();
-                    if (objds != null)
+                    Datasets objdsFromDB = null;
+                    objdsFromDB = _dbContext.datasets.Where(d => d.datasetname == objInput.datasetname).FirstOrDefault();
+                    if (objdsFromDB != null)
                     {
-                        objds.description = objs.description;
-                        objds.attribute = objs.attribute;
-                        objds.referenceid = objs.referenceid;
-                        objds.adminid = objs.adminid;
-
+                        objdsFromDB.description = objInput.description;
+                        objdsFromDB.attribute = objInput.attribute;
+                        objdsFromDB.referenceid = objInput.referenceid;
+                        if (objdsFromDB.adminid != objInput.adminid)                    //chaging admin user id for the dataset
+                        {
+                            //Step 1: remove isadmin from datasetmap for the existing user
+                            DatasetMap datasetMap1 = null;
+                            if (objdsFromDB.adminid != null)                            //if admin user was previously mentioned at all(hence not null check)
+                            {
+                                datasetMap1 = _dbContext.datasetmap.Where(x => x.datasetid == objdsFromDB.id && x.userid.ToString() == objdsFromDB.adminid).FirstOrDefault();
+                                if (datasetMap1 != null)
+                                {
+                                    if (datasetMap1.isadmin)
+                                    {
+                                        datasetMap1.isadmin = false;
+                                    }
+                                }
+                            }
+                            //Step 2: add isadmin in datasetmap for new user
+                            DatasetMap datasetMap2 = null;
+                            if (objInput.adminid != null)                            //if any admin user is mentioned in the current object(hence not null check)
+                            {
+                                datasetMap2 = _dbContext.datasetmap.Where(x => x.datasetid == objdsFromDB.id && x.userid.ToString() == objInput.adminid).FirstOrDefault();
+                                if (datasetMap2 != null)
+                                {
+                                    if (!datasetMap2.isadmin)
+                                    {
+                                        datasetMap2.isadmin = true;
+                                    }
+                                }
+                            }
+                            objdsFromDB.adminid = objInput.adminid;
+                        }
                         _dbContext.SaveChanges();
-
-
                         return Ok(new
                         {
                             success = 1,
@@ -154,21 +181,34 @@ namespace canonapi.Controllers
                 }
                 if (objs != null)
                 {
-                    _dbContext.datasets.Remove(objs);
-                    _dbContext.SaveChanges();
-
-                    return Ok(new
+                    Datasets dsFromDB = _dbContext.datasets.Where(d => d.datasetname == objs.datasetname).FirstOrDefault();
+                    if (dsFromDB != null)
                     {
-                        success = 1,
-                        message = "Success"
-                    });
+                        _dbContext.datasets.Remove(dsFromDB);
+                        _dbContext.datasetmap.RemoveRange(_dbContext.datasetmap.Where(x => x.datasetid == dsFromDB.id));
+                        _dbContext.SaveChanges();
+
+                        return Ok(new
+                        {
+                            success = 1,
+                            message = "Success"
+                        });
+                    }
+                    else
+                    {
+                        return Ok(new
+                        {
+                            success = 0,
+                            message = "No matching dataset found"
+                        });
+                    }
                 }
                 else
                 {
                     return Ok(new
                     {
                         success = 0,
-                        message = "No matching dataset found"
+                        message = "Invalid Input"
                     });
                 }
             }
@@ -183,24 +223,246 @@ namespace canonapi.Controllers
         }
 
         [HttpGet]
-        [ActionName("GetAllDatasets")]
-        public IActionResult GetAllDatasets()
+        [ActionName("GetDatasetDetails")]
+        public IActionResult GetDatasetDetails(string datasetname = null)
         {
             try
             {
-                if (!GetUser().admin)
+                User objLeggedInUser = GetUser();
+
+                #region checking input string first commented
+                //if (String.IsNullOrEmpty(datasetname))
+                //{
+                //    if (objUser.admin)
+                //    {
+                //        return Ok(new
+                //        {
+                //            success = 1,
+                //            data = _dbContext.datasets.ToList()
+                //        });
+                //    }
+                //    else
+                //    {
+                //        int[] allowedDatasets = _dbContext.datasetmap.Where(dm => dm.userid == objUser.id).Select(dm => dm.datasetid).ToArray();
+                //        return Ok(new
+                //        {
+                //            success = 1,
+                //            data = _dbContext.datasets.Where(d => allowedDatasets.Contains(d.id)).ToList()
+                //        });
+                //    }
+                //}
+                //else
+                //{
+                //    if (objUser.admin)
+                //    {
+                //        return Ok(new
+                //        {
+                //            success = 1,
+                //            data = _dbContext.datasets.Where(d => d.datasetname == datasetname).ToList()
+                //        });
+                //    }
+                //    else
+                //    {
+                //        int[] allowedDatasets = _dbContext.datasetmap.Where(dm => dm.userid == objUser.id).Select(dm => dm.datasetid).ToArray();
+                //        Datasets outds = _dbContext.datasets.Where(d => d.datasetname == datasetname).FirstOrDefault();
+                //        if (allowedDatasets.Contains(outds.id))
+                //        {
+                //            return Ok(new
+                //            {
+                //                success = 1,
+                //                data = outds
+                //            });
+                //        }
+                //        else
+                //        {
+                //            return Ok(new
+                //            {
+                //                success = default(int),
+                //                message = "User does not have access to the given dataset"
+                //            });
+                //        }
+                //    }
+                //} 
+                #endregion
+
+                if (objLeggedInUser.admin)
                 {
                     return Ok(new
                     {
-                        success = default(int),
-                        message = "User does not have enough rights"
+                        success = 1,
+                        data = String.IsNullOrEmpty(datasetname) ? _dbContext.datasets.ToList() : _dbContext.datasets.Where(d => d.datasetname == datasetname).ToList()
                     });
                 }
+                else
+                {
+                    int[] allowedDatasets = _dbContext.datasetmap.Where(dm => dm.userid == objLeggedInUser.id).Select(dm => dm.datasetid).ToArray();
+                    if (String.IsNullOrEmpty(datasetname))
+                    {
+                        return Ok(new
+                        {
+                            success = 1,
+                            data = _dbContext.datasets.Where(d => allowedDatasets.Contains(d.id)).ToList()
+                        });
+                    }
+                    else
+                    {
+                        Datasets outds = _dbContext.datasets.Where(d => d.datasetname == datasetname).FirstOrDefault();
+                        if (allowedDatasets.Contains(outds.id))
+                        {
+                            return Ok(new
+                            {
+                                success = 1,
+                                data = outds
+                            });
+                        }
+                        else
+                        {
+                            return Ok(new
+                            {
+                                success = default(int),
+                                message = "User does not have access to the given dataset"
+                            });
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return Ok(new
+                {
+                    success = default(int),
+                    message = "Exception has been detected. Please contact to the authority."
+                });
+            }
+        }
 
+        [HttpGet]
+        [ActionName("GetUsersForDatset")]
+        public IActionResult GetUsersForDatset([FromQuery] string datasetname = null)
+        {
+            try
+            {
+                User loggedInUser = GetUser();
+
+                List<UsersForDataset> lstOut = new List<UsersForDataset>();
+
+                if (String.IsNullOrEmpty(datasetname))
+                {
+                    if (loggedInUser.admin)
+                    {
+                        foreach (Datasets dataset in _dbContext.datasets.ToList())
+                        {
+                            UsersForDataset usersForDataset = new UsersForDataset();
+                            usersForDataset.dataset = dataset;
+                            usersForDataset.lstMappedUsers = (from dm in _dbContext.datasetmap
+                                                              join u in _dbContext.users on dm.userid equals u.id
+                                                              where dm.datasetid == dataset.id
+                                                              orderby dm.id
+                                                              select new MappedUsers()
+                                                              {
+                                                                  userid = u.id,
+                                                                  username = u.username,
+                                                                  firstname = u.firstname,
+                                                                  lastname = u.lastname,
+                                                                  adminuser = u.admin,
+                                                                  isadmin = dm.isadmin,
+                                                                  isanonymous = dm.isanonymous
+                                                              }).ToList();
+                            lstOut.Add(usersForDataset);
+                        }
+                    }
+                    else
+                    {
+                        int[] allowedDatasets = _dbContext.datasetmap.Where(dm => dm.userid == loggedInUser.id).Select(dm => dm.datasetid).ToArray();
+                        foreach (Datasets dataset in _dbContext.datasets.Where(d => allowedDatasets.Contains(d.id)).ToList())
+                        {
+                            UsersForDataset usersForDataset = new UsersForDataset();
+                            usersForDataset.dataset = dataset;
+                            usersForDataset.lstMappedUsers = (from dm in _dbContext.datasetmap
+                                                              join u in _dbContext.users on dm.userid equals u.id
+                                                              orderby dm.id
+                                                              where dm.datasetid == dataset.id
+                                                              select new MappedUsers()
+                                                              {
+                                                                  userid = u.id,
+                                                                  username = u.username,
+                                                                  firstname = u.firstname,
+                                                                  lastname = u.lastname,
+                                                                  adminuser = u.admin,
+                                                                  isadmin = dm.isadmin,
+                                                                  isanonymous = dm.isanonymous
+                                                              }).ToList();
+
+                            lstOut.Add(usersForDataset);
+                        }
+                    }
+                }
+                else
+                {
+                    if (loggedInUser.admin)
+                    {
+                        UsersForDataset usersForDataset = new UsersForDataset();
+                        usersForDataset.dataset = _dbContext.datasets.Where(d => d.datasetname == datasetname).FirstOrDefault();
+                        if (usersForDataset.dataset != null)
+                        {
+                            usersForDataset.lstMappedUsers = (from dm in _dbContext.datasetmap
+                                                              join u in _dbContext.users on dm.userid equals u.id
+                                                              where dm.datasetid == usersForDataset.dataset.id
+                                                              orderby dm.id
+                                                              select new MappedUsers()
+                                                              {
+                                                                  userid = u.id,
+                                                                  username = u.username,
+                                                                  firstname = u.firstname,
+                                                                  lastname = u.lastname,
+                                                                  adminuser = u.admin,
+                                                                  isadmin = dm.isadmin,
+                                                                  isanonymous = dm.isanonymous
+                                                              }).ToList();
+                        }
+                        lstOut.Add(usersForDataset);
+                    }
+                    else
+                    {
+                        int[] allowedDatasets = _dbContext.datasetmap.Where(dm => dm.userid == loggedInUser.id).Select(dm => dm.datasetid).ToArray();
+                        Datasets ds = _dbContext.datasets.Where(d => d.datasetname == datasetname).FirstOrDefault();
+                        if(allowedDatasets.Contains(ds.id))
+                        {
+                            UsersForDataset usersForDataset = new UsersForDataset();
+                            usersForDataset.dataset = ds;
+                            if (usersForDataset.dataset != null)
+                            {
+                                usersForDataset.lstMappedUsers = (from dm in _dbContext.datasetmap
+                                                                  join u in _dbContext.users on dm.userid equals u.id
+                                                                  where dm.datasetid == usersForDataset.dataset.id
+                                                                  orderby dm.id
+                                                                  select new MappedUsers()
+                                                                  {
+                                                                      userid = u.id,
+                                                                      username = u.username,
+                                                                      firstname = u.firstname,
+                                                                      lastname = u.lastname,
+                                                                      adminuser = u.admin,
+                                                                      isadmin = dm.isadmin,
+                                                                      isanonymous = dm.isanonymous
+                                                                  }).ToList();
+                            }
+                            lstOut.Add(usersForDataset);
+                        }
+                        else
+                        {
+                            return Ok(new
+                            {
+                                success = default(int),
+                                message = "User does not have access to the given dataset"
+                            });
+                        }
+                    }
+                }
                 return Ok(new
                 {
                     success = 1,
-                    data = _dbContext.datasets.ToList()
+                    data = lstOut
                 });
             }
             catch (Exception ex)
