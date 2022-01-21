@@ -49,7 +49,7 @@ public class ImageHandler
     {
         try
         {
-            string filepath = string.Format("{0}{1}{2}", isthumbnail ? _configuration["LocalThumbnailPath"] : _configuration["LocalFilePath"], filename, isthumbnail ? ".png" : ".png");
+            string filepath = string.Format("{0}{1}"/*{2}"*/, isthumbnail ? _configuration["LocalThumbnailPath"] : _configuration["LocalFilePath"], filename/*, isthumbnail ? ".png" : ".png"*/);
 
             using (MemoryStream ms = new MemoryStream())
             {

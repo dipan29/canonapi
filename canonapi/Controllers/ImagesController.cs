@@ -645,7 +645,7 @@ namespace canonapi.Controllers
                 {
                     var imgOutObj = new ImageOut();
                     imgOutObj.id = i.id;
-                    imgOutObj.thumbnail = new ImageHandler(_configuration).GetFileFromLocal(i.imagename, true);
+                    //imgOutObj.thumbnail = new ImageHandler(_configuration).GetFileFromLocal(i.imageurl, true);
                     imgOutObj.drlevel_kaggle = (DRStatus)i.drlevel_kaggle;
                     imgOutObj.drlevel_sushrut = (DRStatus)i.drlevel_sushrut;
                     imgOutObj.drlevel_byuser = dr;
@@ -884,7 +884,8 @@ namespace canonapi.Controllers
                 obj.drlevel_sushrut = (DRStatus)objImage.drlevel_sushrut;
                 obj.drlevel_byuser = userGradedImage != null ? (DRStatus)userGradedImage.drlevel_byuser : DRStatus.All;
                 obj.subdiseaseids = userGradedImage != null && !string.IsNullOrEmpty(userGradedImage.subdiseaseids) ? userGradedImage.subdiseaseids.Split(',').Select(int.Parse).ToList() : null;
-                obj.image = new ImageHandler(_configuration).GetFileFromLocal(objImage.imagename);
+                //obj.image = new ImageHandler(_configuration).GetFileFromLocal(objImage.imagename);
+                obj.image = new ImageHandler(_configuration).GetFileFromLocal(objImage.imageurl);
                 obj.regionannotation = userGradedImage != null && !string.IsNullOrEmpty(userGradedImage.regionannotation) ? GetSavedAnnotationById(userGradedImage.regionannotation) : null;
 
                 return Ok(new
