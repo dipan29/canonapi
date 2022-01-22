@@ -93,15 +93,16 @@ namespace canonapi.Models
 
     public enum DRStatus
     {
-        All = -2,
-        Ungraded = -1,
+        All = -1,//-2,
+        //Ungraded = -1,
         DR0 = 0,
         DR1 = 1,
         DR2 = 2,
         DR3 = 3,
         DR4 = 4,
         Others = 5,
-        Ungradable = 6
+        Ungradable = 6,
+        Ungraded = 7
     }
 
     public enum KaggleAndSushrutMatchedImages

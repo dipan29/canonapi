@@ -64,6 +64,7 @@ public class BucketCalculator
             }
             else
             {
+                List<string> AllowedImages = _dbContext.images.Where(i => arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
                 if (matchingscope == KaggleAndSushrutMatchedImages.Yes)
                 {
                     IEnumerable<string> sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle == i.drlevel_sushrut
@@ -74,14 +75,14 @@ public class BucketCalculator
 
                     IEnumerable<string> userDRxImages = _dbContext.imagedrbyusers.Where(u => u.userid == userid
                     && u.kaggle_sushrut_drmatched == matchingscope.GetHashCode()
-                    && u.drlevel_byuser == dr.GetHashCode()).Select(i => i.imagename).ToList();
+                    && u.drlevel_byuser == dr.GetHashCode() && AllowedImages.Contains(u.imagename)).Select(i => i.imagename).ToList();
                     ///////////////////////////////
                     List<string> userDRxImagesCopy = new List<string>();
                     userDRxImagesCopy.AddRange(userDRxImages);
 
                     IEnumerable<string> userNotDRxImages = _dbContext.imagedrbyusers.Where(u => u.userid == userid
                     && u.kaggle_sushrut_drmatched == matchingscope.GetHashCode()
-                    && u.drlevel_byuser != dr.GetHashCode()).Select(i => i.imagename).ToList();
+                    && u.drlevel_byuser != dr.GetHashCode() && AllowedImages.Contains(u.imagename)).Select(i => i.imagename).ToList();
                     ///////////////////////////////
                     List<string> userNotDRxImagesCopy = new List<string>();
                     userNotDRxImagesCopy.AddRange(userNotDRxImages);
@@ -106,14 +107,14 @@ public class BucketCalculator
 
                     IEnumerable<string> userDRxImages = _dbContext.imagedrbyusers.Where(u => u.userid == userid
                     && u.kaggle_sushrut_drmatched == matchingscope.GetHashCode()
-                    && u.drlevel_byuser == dr.GetHashCode()).Select(i => i.imagename).ToList();
+                    && u.drlevel_byuser == dr.GetHashCode() && AllowedImages.Contains(u.imagename)).Select(i => i.imagename).ToList();
                     ///////////////////////////////
                     List<string> userDRxImagesCopy = new List<string>();
                     userDRxImagesCopy.AddRange(userDRxImages);
 
                     IEnumerable<string> userNotDRxImages = _dbContext.imagedrbyusers.Where(u => u.userid == userid
                     && u.kaggle_sushrut_drmatched == matchingscope.GetHashCode()
-                    && u.drlevel_byuser != dr.GetHashCode()).Select(i => i.imagename).ToList();
+                    && u.drlevel_byuser != dr.GetHashCode() && AllowedImages.Contains(u.imagename)).Select(i => i.imagename).ToList();
                     ///////////////////////////////
                     List<string> userNotDRxImagesCopy = new List<string>();
                     userNotDRxImagesCopy.AddRange(userNotDRxImages);
@@ -136,13 +137,13 @@ public class BucketCalculator
                     sourceDRxImagesCopy.AddRange(sourceDRxImages);
 
                     IEnumerable<string> userDRxImages = _dbContext.imagedrbyusers.Where(u => u.userid == userid
-                    && u.drlevel_byuser == dr.GetHashCode()).Select(i => i.imagename).ToList();
+                    && u.drlevel_byuser == dr.GetHashCode() && AllowedImages.Contains(u.imagename)).Select(i => i.imagename).ToList();
                     ///////////////////////////////
                     List<string> userDRxImagesCopy = new List<string>();
                     userDRxImagesCopy.AddRange(userDRxImages);
 
                     IEnumerable<string> userNotDRxImages = _dbContext.imagedrbyusers.Where(u => u.userid == userid
-                    && u.drlevel_byuser != dr.GetHashCode()).Select(i => i.imagename).ToList();
+                    && u.drlevel_byuser != dr.GetHashCode() && AllowedImages.Contains(u.imagename)).Select(i => i.imagename).ToList();
                     ///////////////////////////////
                     List<string> userNotDRxImagesCopy = new List<string>();
                     userNotDRxImagesCopy.AddRange(userNotDRxImages);
@@ -224,6 +225,7 @@ public class BucketCalculator
             }
             else
             {
+                List<string> AllowedImages = _dbContext.images.Where(i => arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
                 if (matchingscope == KaggleAndSushrutMatchedImages.Yes)
                 {
                     IEnumerable<string> sourceDRxImages = new List<string>();
@@ -254,14 +256,14 @@ public class BucketCalculator
 
                     IEnumerable<string> userDRxImages = _dbContext.imagedrbyusers.Where(u => u.userid == userid
                     && u.kaggle_sushrut_drmatched == matchingscope.GetHashCode()
-                    && u.drlevel_byuser == dr.GetHashCode()).Select(i => i.imagename).ToList();
+                    && u.drlevel_byuser == dr.GetHashCode() && AllowedImages.Contains(u.imagename)).Select(i => i.imagename).ToList();
                     ///////////////////////////////
                     List<string> userDRxImagesCopy = new List<string>();
                     userDRxImagesCopy.AddRange(userDRxImages);
 
                     IEnumerable<string> userNotDRxImages = _dbContext.imagedrbyusers.Where(u => u.userid == userid
                     && u.kaggle_sushrut_drmatched == matchingscope.GetHashCode()
-                    && u.drlevel_byuser != dr.GetHashCode()).Select(i => i.imagename).ToList();
+                    && u.drlevel_byuser != dr.GetHashCode() && AllowedImages.Contains(u.imagename)).Select(i => i.imagename).ToList();
                     ///////////////////////////////
                     List<string> userNotDRxImagesCopy = new List<string>();
                     userNotDRxImagesCopy.AddRange(userNotDRxImages);
@@ -306,14 +308,14 @@ public class BucketCalculator
 
                     IEnumerable<string> userDRxImages = _dbContext.imagedrbyusers.Where(u => u.userid == userid
                     && u.kaggle_sushrut_drmatched == matchingscope.GetHashCode()
-                    && u.drlevel_byuser == dr.GetHashCode()).Select(i => i.imagename).ToList();
+                    && u.drlevel_byuser == dr.GetHashCode() && AllowedImages.Contains(u.imagename)).Select(i => i.imagename).ToList();
                     ///////////////////////////////
                     List<string> userDRxImagesCopy = new List<string>();
                     userDRxImagesCopy.AddRange(userDRxImages);
 
                     IEnumerable<string> userNotDRxImages = _dbContext.imagedrbyusers.Where(u => u.userid == userid
                     && u.kaggle_sushrut_drmatched == matchingscope.GetHashCode()
-                    && u.drlevel_byuser != dr.GetHashCode()).Select(i => i.imagename).ToList();
+                    && u.drlevel_byuser != dr.GetHashCode() && AllowedImages.Contains(u.imagename)).Select(i => i.imagename).ToList();
                     ///////////////////////////////
                     List<string> userNotDRxImagesCopy = new List<string>();
                     userNotDRxImagesCopy.AddRange(userNotDRxImages);
@@ -356,13 +358,13 @@ public class BucketCalculator
                     sourceDRxImagesCopy.AddRange(sourceDRxImages);
 
                     IEnumerable<string> userDRxImages = _dbContext.imagedrbyusers.Where(u => u.userid == userid
-                    && u.drlevel_byuser == dr.GetHashCode()).Select(i => i.imagename).ToList();
+                    && u.drlevel_byuser == dr.GetHashCode() && AllowedImages.Contains(u.imagename)).Select(i => i.imagename).ToList();
                     ///////////////////////////////
                     List<string> userDRxImagesCopy = new List<string>();
                     userDRxImagesCopy.AddRange(userDRxImages);
 
                     IEnumerable<string> userNotDRxImages = _dbContext.imagedrbyusers.Where(u => u.userid == userid
-                    && u.drlevel_byuser != dr.GetHashCode()).Select(i => i.imagename).ToList();
+                    && u.drlevel_byuser != dr.GetHashCode() && AllowedImages.Contains(u.imagename)).Select(i => i.imagename).ToList();
                     ///////////////////////////////
                     List<string> userNotDRxImagesCopy = new List<string>();
                     userNotDRxImagesCopy.AddRange(userNotDRxImages);
@@ -444,6 +446,7 @@ public class BucketCalculator
             }
             else
             {
+                List<string> AllowedImages = _dbContext.images.Where(i => arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
                 if (matchingscope == KaggleAndSushrutMatchedImages.Yes)
                 {
                     IEnumerable<string> sourceDRxImages = new List<string>();
@@ -474,14 +477,14 @@ public class BucketCalculator
 
                     IEnumerable<string> userDRxImages = _dbContext.imagedrbyusers.Where(u => u.userid == userid
                     && u.kaggle_sushrut_drmatched == matchingscope.GetHashCode()
-                    && u.drlevel_byuser == dr.GetHashCode()).Select(i => i.imagename).ToList();
+                    && u.drlevel_byuser == dr.GetHashCode() && AllowedImages.Contains(u.imagename)).Select(i => i.imagename).ToList();
                     ///////////////////////////////
                     List<string> userDRxImagesCopy = new List<string>();
                     userDRxImagesCopy.AddRange(userDRxImages);
 
                     IEnumerable<string> userNotDRxImages = _dbContext.imagedrbyusers.Where(u => u.userid == userid
                     && u.kaggle_sushrut_drmatched == matchingscope.GetHashCode()
-                    && u.drlevel_byuser != dr.GetHashCode()).Select(i => i.imagename).ToList();
+                    && u.drlevel_byuser != dr.GetHashCode() && AllowedImages.Contains(u.imagename)).Select(i => i.imagename).ToList();
                     ///////////////////////////////
                     List<string> userNotDRxImagesCopy = new List<string>();
                     userNotDRxImagesCopy.AddRange(userNotDRxImages);
@@ -543,14 +546,14 @@ public class BucketCalculator
 
                     IEnumerable<string> userDRxImages = _dbContext.imagedrbyusers.Where(u => u.userid == userid
                     && u.kaggle_sushrut_drmatched == matchingscope.GetHashCode()
-                    && u.drlevel_byuser == dr.GetHashCode()).Select(i => i.imagename).ToList();
+                    && u.drlevel_byuser == dr.GetHashCode() && AllowedImages.Contains(u.imagename)).Select(i => i.imagename).ToList();
                     ///////////////////////////////
                     List<string> userDRxImagesCopy = new List<string>();
                     userDRxImagesCopy.AddRange(userDRxImages);
 
                     IEnumerable<string> userNotDRxImages = _dbContext.imagedrbyusers.Where(u => u.userid == userid
                     && u.kaggle_sushrut_drmatched == matchingscope.GetHashCode()
-                    && u.drlevel_byuser != dr.GetHashCode()).Select(i => i.imagename).ToList();
+                    && u.drlevel_byuser != dr.GetHashCode() && AllowedImages.Contains(u.imagename)).Select(i => i.imagename).ToList();
                     ///////////////////////////////
                     List<string> userNotDRxImagesCopy = new List<string>();
                     userNotDRxImagesCopy.AddRange(userNotDRxImages);
@@ -610,13 +613,13 @@ public class BucketCalculator
                     sourceDRxImagesCopy.AddRange(sourceDRxImages);
 
                     IEnumerable<string> userDRxImages = _dbContext.imagedrbyusers.Where(u => u.userid == userid
-                    && u.drlevel_byuser == dr.GetHashCode()).Select(i => i.imagename).ToList();
+                    && u.drlevel_byuser == dr.GetHashCode() && AllowedImages.Contains(u.imagename)).Select(i => i.imagename).ToList();
                     ///////////////////////////////
                     List<string> userDRxImagesCopy = new List<string>();
                     userDRxImagesCopy.AddRange(userDRxImages);
 
                     IEnumerable<string> userNotDRxImages = _dbContext.imagedrbyusers.Where(u => u.userid == userid
-                    && u.drlevel_byuser != dr.GetHashCode()).Select(i => i.imagename).ToList();
+                    && u.drlevel_byuser != dr.GetHashCode() && AllowedImages.Contains(u.imagename)).Select(i => i.imagename).ToList();
                     ///////////////////////////////
                     List<string> userNotDRxImagesCopy = new List<string>();
                     userNotDRxImagesCopy.AddRange(userNotDRxImages);

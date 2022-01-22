@@ -171,11 +171,12 @@ namespace canonapi.Controllers
 
                 List<DatasetMap> lstDatasetMap = new BucketCalculator().GetDatasetMapping(_dbContext, userObj.id, datasetids);
                 int[] arrDatasetIds = lstDatasetMap.Select(i => i.datasetid).ToArray();
+                List<string> AllowedImages = _dbContext.images.Where(i => arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
 
                 if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.Yes)
                 {
                     counts.totalImagesPredicted = _dbContext.imagedrbyusers.Where(u => u.userid == userObj.id
-                    && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.Yes.GetHashCode()).Count();
+                    && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.Yes.GetHashCode() && AllowedImages.Contains(u.imagename)).Count();
 
                     ////counts.totalUngradedImages = _dbContext.imagedrbyusers.Where(u => u.userid == userObj.id
                     ////&& u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.Yes.GetHashCode()
@@ -183,31 +184,31 @@ namespace canonapi.Controllers
 
                     counts.totalDR0FromPredicted = _dbContext.imagedrbyusers.Where(u => u.userid == userObj.id
                     && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.Yes.GetHashCode()
-                    && u.drlevel_byuser == DRStatus.DR0.GetHashCode()).Count();
+                    && u.drlevel_byuser == DRStatus.DR0.GetHashCode() && AllowedImages.Contains(u.imagename)).Count();
 
                     counts.totalDR1FromPredicted = _dbContext.imagedrbyusers.Where(u => u.userid == userObj.id
                     && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.Yes.GetHashCode()
-                    && u.drlevel_byuser == DRStatus.DR1.GetHashCode()).Count();
+                    && u.drlevel_byuser == DRStatus.DR1.GetHashCode() && AllowedImages.Contains(u.imagename)).Count();
 
                     counts.totalDR2FromPredicted = _dbContext.imagedrbyusers.Where(u => u.userid == userObj.id
                     && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.Yes.GetHashCode()
-                    && u.drlevel_byuser == DRStatus.DR2.GetHashCode()).Count();
+                    && u.drlevel_byuser == DRStatus.DR2.GetHashCode() && AllowedImages.Contains(u.imagename)).Count();
 
                     counts.totalDR3FromPredicted = _dbContext.imagedrbyusers.Where(u => u.userid == userObj.id
                     && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.Yes.GetHashCode()
-                    && u.drlevel_byuser == DRStatus.DR3.GetHashCode()).Count();
+                    && u.drlevel_byuser == DRStatus.DR3.GetHashCode() && AllowedImages.Contains(u.imagename)).Count();
 
                     counts.totalDR4FromPredicted = _dbContext.imagedrbyusers.Where(u => u.userid == userObj.id
                     && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.Yes.GetHashCode()
-                    && u.drlevel_byuser == DRStatus.DR4.GetHashCode()).Count();
+                    && u.drlevel_byuser == DRStatus.DR4.GetHashCode() && AllowedImages.Contains(u.imagename)).Count();
 
                     counts.totalOthersFromPredicted = _dbContext.imagedrbyusers.Where(u => u.userid == userObj.id
                     && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.Yes.GetHashCode()
-                    && u.drlevel_byuser == DRStatus.Others.GetHashCode()).Count();
+                    && u.drlevel_byuser == DRStatus.Others.GetHashCode() && AllowedImages.Contains(u.imagename)).Count();
 
                     counts.totalUngradableImages = _dbContext.imagedrbyusers.Where(u => u.userid == userObj.id
                     && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.Yes.GetHashCode()
-                    && u.drlevel_byuser == DRStatus.Ungradable.GetHashCode()).Count();
+                    && u.drlevel_byuser == DRStatus.Ungradable.GetHashCode() && AllowedImages.Contains(u.imagename)).Count();
 
                     counts.totalImages = _dbContext.images.Where(i => i.drlevel_kaggle == i.drlevel_sushrut && arrDatasetIds.Contains(i.datasetid)).Count();
 
@@ -216,7 +217,7 @@ namespace canonapi.Controllers
                 else if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.No)
                 {
                     counts.totalImagesPredicted = _dbContext.imagedrbyusers.Where(u => u.userid == userObj.id
-                    && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.No.GetHashCode()).Count();
+                    && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.No.GetHashCode() && AllowedImages.Contains(u.imagename)).Count();
 
                     ////counts.totalUngradedImages = _dbContext.imagedrbyusers.Where(u => u.userid == userObj.id
                     ////&& u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.No.GetHashCode()
@@ -224,31 +225,31 @@ namespace canonapi.Controllers
 
                     counts.totalDR0FromPredicted = _dbContext.imagedrbyusers.Where(u => u.userid == userObj.id
                     && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.No.GetHashCode()
-                    && u.drlevel_byuser == DRStatus.DR0.GetHashCode()).Count();
+                    && u.drlevel_byuser == DRStatus.DR0.GetHashCode() && AllowedImages.Contains(u.imagename)).Count();
 
                     counts.totalDR1FromPredicted = _dbContext.imagedrbyusers.Where(u => u.userid == userObj.id
                     && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.No.GetHashCode()
-                    && u.drlevel_byuser == DRStatus.DR1.GetHashCode()).Count();
+                    && u.drlevel_byuser == DRStatus.DR1.GetHashCode() && AllowedImages.Contains(u.imagename)).Count();
 
                     counts.totalDR2FromPredicted = _dbContext.imagedrbyusers.Where(u => u.userid == userObj.id
                     && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.No.GetHashCode()
-                    && u.drlevel_byuser == DRStatus.DR2.GetHashCode()).Count();
+                    && u.drlevel_byuser == DRStatus.DR2.GetHashCode() && AllowedImages.Contains(u.imagename)).Count();
 
                     counts.totalDR3FromPredicted = _dbContext.imagedrbyusers.Where(u => u.userid == userObj.id
                     && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.No.GetHashCode()
-                    && u.drlevel_byuser == DRStatus.DR3.GetHashCode()).Count();
+                    && u.drlevel_byuser == DRStatus.DR3.GetHashCode() && AllowedImages.Contains(u.imagename)).Count();
 
                     counts.totalDR4FromPredicted = _dbContext.imagedrbyusers.Where(u => u.userid == userObj.id
                     && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.No.GetHashCode()
-                    && u.drlevel_byuser == DRStatus.DR4.GetHashCode()).Count();
+                    && u.drlevel_byuser == DRStatus.DR4.GetHashCode() && AllowedImages.Contains(u.imagename)).Count();
 
                     counts.totalOthersFromPredicted = _dbContext.imagedrbyusers.Where(u => u.userid == userObj.id
                     && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.No.GetHashCode()
-                    && u.drlevel_byuser == DRStatus.Others.GetHashCode()).Count();
+                    && u.drlevel_byuser == DRStatus.Others.GetHashCode() && AllowedImages.Contains(u.imagename)).Count();
 
                     counts.totalUngradableImages = _dbContext.imagedrbyusers.Where(u => u.userid == userObj.id
                     && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.No.GetHashCode()
-                    && u.drlevel_byuser == DRStatus.Ungradable.GetHashCode()).Count();
+                    && u.drlevel_byuser == DRStatus.Ungradable.GetHashCode() && AllowedImages.Contains(u.imagename)).Count();
 
                     counts.totalImages = _dbContext.images.Where(i => i.drlevel_kaggle != i.drlevel_sushrut && arrDatasetIds.Contains(i.datasetid)).Count();
 
@@ -257,7 +258,7 @@ namespace canonapi.Controllers
                 else
                 {
                     counts.totalImagesPredicted = _dbContext.imagedrbyusers.Where(u => u.userid == userObj.id
-                    && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.All.GetHashCode()).Count();
+                    && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.All.GetHashCode() && AllowedImages.Contains(u.imagename)).Count();
 
                     ////counts.totalUngradedImages = _dbContext.imagedrbyusers.Where(u => u.userid == userObj.id
                     ////&& u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.All.GetHashCode()
@@ -265,31 +266,31 @@ namespace canonapi.Controllers
 
                     counts.totalDR0FromPredicted = _dbContext.imagedrbyusers.Where(u => u.userid == userObj.id
                     && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.All.GetHashCode()
-                    && u.drlevel_byuser == DRStatus.DR0.GetHashCode()).Count();
+                    && u.drlevel_byuser == DRStatus.DR0.GetHashCode() && AllowedImages.Contains(u.imagename)).Count();
 
                     counts.totalDR1FromPredicted = _dbContext.imagedrbyusers.Where(u => u.userid == userObj.id
                     && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.All.GetHashCode()
-                    && u.drlevel_byuser == DRStatus.DR1.GetHashCode()).Count();
+                    && u.drlevel_byuser == DRStatus.DR1.GetHashCode() && AllowedImages.Contains(u.imagename)).Count();
 
                     counts.totalDR2FromPredicted = _dbContext.imagedrbyusers.Where(u => u.userid == userObj.id
                     && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.All.GetHashCode()
-                    && u.drlevel_byuser == DRStatus.DR2.GetHashCode()).Count();
+                    && u.drlevel_byuser == DRStatus.DR2.GetHashCode() && AllowedImages.Contains(u.imagename)).Count();
 
                     counts.totalDR3FromPredicted = _dbContext.imagedrbyusers.Where(u => u.userid == userObj.id
                     && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.All.GetHashCode()
-                    && u.drlevel_byuser == DRStatus.DR3.GetHashCode()).Count();
+                    && u.drlevel_byuser == DRStatus.DR3.GetHashCode() && AllowedImages.Contains(u.imagename)).Count();
 
                     counts.totalDR4FromPredicted = _dbContext.imagedrbyusers.Where(u => u.userid == userObj.id
                     && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.All.GetHashCode()
-                    && u.drlevel_byuser == DRStatus.DR4.GetHashCode()).Count();
+                    && u.drlevel_byuser == DRStatus.DR4.GetHashCode() && AllowedImages.Contains(u.imagename)).Count();
 
                     counts.totalOthersFromPredicted = _dbContext.imagedrbyusers.Where(u => u.userid == userObj.id
                     && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.All.GetHashCode()
-                    && u.drlevel_byuser == DRStatus.Others.GetHashCode()).Count();
+                    && u.drlevel_byuser == DRStatus.Others.GetHashCode() && AllowedImages.Contains(u.imagename)).Count();
 
                     counts.totalUngradableImages = _dbContext.imagedrbyusers.Where(u => u.userid == userObj.id
                     && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.All.GetHashCode()
-                    && u.drlevel_byuser == DRStatus.Ungradable.GetHashCode()).Count();
+                    && u.drlevel_byuser == DRStatus.Ungradable.GetHashCode() && AllowedImages.Contains(u.imagename)).Count();
 
                     counts.totalImages = _dbContext.images.Where(i => arrDatasetIds.Contains(i.datasetid)).Count();
 
@@ -537,6 +538,7 @@ namespace canonapi.Controllers
 
                 List<DatasetMap> lstDatasetMap = new BucketCalculator().GetDatasetMapping(_dbContext, userObj.id, datasetids);
                 int[] arrDatasetIds = lstDatasetMap.Select(i => i.datasetid).ToArray();
+                List<string> AllowedImages = _dbContext.images.Where(i => arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
 
                 var skip = (page - 1) * limit;
                 IEnumerable<Image> savedSearches = null;
@@ -547,7 +549,7 @@ namespace canonapi.Controllers
                     if (dr == DRStatus.All || dr == DRStatus.Ungraded)
                     {
                         userGradedImagesConditional = _dbContext.imagedrbyusers.Where(u => u.userid == userObj.id
-                        && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.Yes.GetHashCode());
+                        && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.Yes.GetHashCode() && AllowedImages.Contains(u.imagename));
 
                         if (userGradedImagesConditional != null && userGradedImagesConditional.Count() > default(int))
                         {
@@ -564,7 +566,7 @@ namespace canonapi.Controllers
                     {
                         userGradedImages = _dbContext.imagedrbyusers.Where(u => u.userid == userObj.id
                         && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.Yes.GetHashCode()
-                        && u.drlevel_byuser == dr.GetHashCode());
+                        && u.drlevel_byuser == dr.GetHashCode() && AllowedImages.Contains(u.imagename));
                     }
                 }
                 else if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.No)
@@ -572,7 +574,7 @@ namespace canonapi.Controllers
                     if (dr == DRStatus.All || dr == DRStatus.Ungraded)
                     {
                         userGradedImagesConditional = _dbContext.imagedrbyusers.Where(u => u.userid == userObj.id
-                        && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.No.GetHashCode());
+                        && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.No.GetHashCode() && AllowedImages.Contains(u.imagename));
 
                         if (userGradedImagesConditional != null && userGradedImagesConditional.Count() > default(int))
                         {
@@ -589,7 +591,7 @@ namespace canonapi.Controllers
                     {
                         userGradedImages = _dbContext.imagedrbyusers.Where(u => u.userid == userObj.id
                         && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.No.GetHashCode()
-                        && u.drlevel_byuser == dr.GetHashCode());
+                        && u.drlevel_byuser == dr.GetHashCode() && AllowedImages.Contains(u.imagename));
                     }
                 }
                 else
@@ -597,7 +599,7 @@ namespace canonapi.Controllers
                     if (dr == DRStatus.All || dr == DRStatus.Ungraded)
                     {
                         userGradedImagesConditional = _dbContext.imagedrbyusers.Where(u => u.userid == userObj.id
-                        && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.All.GetHashCode());
+                        && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.All.GetHashCode() && AllowedImages.Contains(u.imagename));
 
                         if (userGradedImagesConditional != null && userGradedImagesConditional.Count() > default(int))
                         {
@@ -614,7 +616,7 @@ namespace canonapi.Controllers
                     {
                         userGradedImages = _dbContext.imagedrbyusers.Where(u => u.userid == userObj.id
                         && u.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.All.GetHashCode()
-                        && u.drlevel_byuser == dr.GetHashCode());
+                        && u.drlevel_byuser == dr.GetHashCode() && AllowedImages.Contains(u.imagename));
                     }
                 }
 
