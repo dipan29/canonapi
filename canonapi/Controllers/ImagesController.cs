@@ -889,6 +889,26 @@ namespace canonapi.Controllers
                 //obj.image = new ImageHandler(_configuration).GetFileFromLocal(objImage.imagename);
                 obj.image = new ImageHandler(_configuration).GetFileFromLocal(objImage.imageurl);
                 obj.regionannotation = userGradedImage != null && !string.IsNullOrEmpty(userGradedImage.regionannotation) ? GetSavedAnnotationById(userGradedImage.regionannotation) : null;
+                obj.datasetid = objImage.datasetid;
+                obj.superadmin = userObj.admin;
+                DatasetMap dsMap = _dbContext.datasetmap.Where(ds => ds.userid == userObj.id && ds.datasetid == objImage.datasetid).FirstOrDefault();
+                obj.is_admin = dsMap.isadmin;
+                obj.is_anonymous = dsMap.isanonymous;
+                if (obj.superadmin || obj.is_admin)
+                {
+                    obj.users_prediction = (from iu in _dbContext.imagedrbyusers
+                                            join u in _dbContext.users on iu.userid equals u.id
+                                            where iu.imagename == objImage.imagename
+                                            where iu.userid != userObj.id
+                                            orderby iu.id
+                                            select new UsersPrediction()
+                                            {
+                                                userid = iu.userid,
+                                                username = u.username,
+                                                predictionid = iu.id,
+                                                dr_level = (DRStatus)iu.drlevel_byuser
+                                            }).ToList();
+                }
 
                 return Ok(new
                 {

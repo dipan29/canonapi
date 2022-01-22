@@ -44,6 +44,19 @@ namespace canonapi.Models
         public string thumbnail { get; set; }
         public string image { get; set; }
         public AnnotationObject regionannotation { get; set; }
+        public int datasetid { get; set; }
+        public bool superadmin { get; set; }
+        public bool is_admin { get; set; }
+        public bool is_anonymous { get; set; }
+        public List<UsersPrediction> users_prediction { get; set; }
+    }
+
+    public class UsersPrediction
+    {
+        public string username { get; set; }
+        public int userid { get; set; }
+        public long predictionid { get; set; }
+        public DRStatus dr_level { get; set; }
     }
 
     public class ImageOutIds
