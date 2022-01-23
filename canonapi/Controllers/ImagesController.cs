@@ -891,6 +891,7 @@ namespace canonapi.Controllers
                 obj.regionannotation = userGradedImage != null && !string.IsNullOrEmpty(userGradedImage.regionannotation) ? GetSavedAnnotationById(userGradedImage.regionannotation) : null;
                 obj.datasetid = objImage.datasetid;
                 obj.superadmin = userObj.admin;
+                obj.markedforreview = userGradedImage.markedforreview;
                 DatasetMap dsMap = _dbContext.datasetmap.Where(ds => ds.userid == userObj.id && ds.datasetid == objImage.datasetid).FirstOrDefault();
                 obj.is_admin = dsMap.isadmin;
                 obj.is_anonymous = dsMap.isanonymous;
@@ -906,7 +907,8 @@ namespace canonapi.Controllers
                                                 userid = iu.userid,
                                                 username = u.username,
                                                 predictionid = iu.id,
-                                                dr_level = (DRStatus)iu.drlevel_byuser
+                                                dr_level = (DRStatus)iu.drlevel_byuser,
+                                                markedforreview = iu.markedforreview
                                             }).ToList();
                 }
 
@@ -917,6 +919,368 @@ namespace canonapi.Controllers
                 });
             }
             catch (Exception ex)
+            {
+                return Ok(new
+                {
+                    success = default(int),
+                    message = "Exception has been detected. Please contact to the authority."
+                });
+            }
+        }
+
+        [HttpGet]
+        [ActionName("GetImagesMarkedForReview")]
+        public IActionResult GetImagesMarkedForReview([FromQuery] string datasetids, [FromQuery] DRStatus dr = DRStatus.All)
+        {
+            try
+            {
+                var claimsIdentity = this.User.Identity as ClaimsIdentity;
+                var username = claimsIdentity.FindFirst(ClaimTypes.Name)?.Value;
+                User userObj = _dbContext.users.SingleOrDefault(u => u.username == username);
+
+                if (userObj.admin)
+                {
+                    if (String.IsNullOrEmpty(datasetids))
+                    {
+                        var result = (from i in _dbContext.images
+                                      join iu in _dbContext.imagedrbyusers on i.imagename equals iu.imagename
+                                      join u in _dbContext.users on iu.userid equals u.id
+                                      where iu.markedforreview == MarkedForReview.requested
+                                      orderby iu.id
+                                      select new
+                                      {
+                                          predictionid = iu.id,
+                                          imageid = i.id,
+                                          imagename = iu.imagename,
+                                          datasetid = i.datasetid,
+                                          kaggle_sushrut_drmatched = iu.kaggle_sushrut_drmatched,
+                                          drlevel_byuser = iu.drlevel_byuser,
+                                          subdiseaseids = iu.subdiseaseids,
+                                          userid = iu.userid,
+                                          username = u.username,
+                                          supedadmin = u.admin,
+                                          createdon = iu.createdon,
+                                          modifiedon = iu.modifiedon,
+                                          regionannotation = iu.regionannotation,
+                                          markedforreview = iu.markedforreview
+                                      }).ToList();
+
+                        return Ok(new
+                        {
+                            success = 1,
+                            data = dr == DRStatus.All ? result : result.Where(r => r.drlevel_byuser == dr.GetHashCode())
+                        });
+                    }
+                    else
+                    {
+                        string[] lstDatasetIds = datasetids.Trim().Split(',');
+                        var result = (from i in _dbContext.images
+                                      join iu in _dbContext.imagedrbyusers on i.imagename equals iu.imagename
+                                      join u in _dbContext.users on iu.userid equals u.id
+                                      where lstDatasetIds.Contains(i.datasetid.ToString())
+                                      where iu.markedforreview == MarkedForReview.requested
+                                      orderby iu.id
+                                      select new
+                                      {
+                                          predictionid = iu.id,
+                                          imageid = i.id,
+                                          imagename = iu.imagename,
+                                          datasetid = i.datasetid,
+                                          kaggle_sushrut_drmatched = iu.kaggle_sushrut_drmatched,
+                                          drlevel_byuser = iu.drlevel_byuser,
+                                          subdiseaseids = iu.subdiseaseids,
+                                          userid = iu.userid,
+                                          username = u.username,
+                                          supedadmin = u.admin,
+                                          createdon = iu.createdon,
+                                          modifiedon = iu.modifiedon,
+                                          regionannotation = iu.regionannotation,
+                                          markedforreview = iu.markedforreview
+                                      }).ToList();
+
+                        return Ok(new
+                        {
+                            success = 1,
+                            data = dr == DRStatus.All ? result : result.Where(r => r.drlevel_byuser == dr.GetHashCode())
+                        });
+                    }
+                }
+                else
+                {
+                    List<DatasetMap> lstDatasetMap = new BucketCalculator().GetDatasetMapping(_dbContext, userObj.id, datasetids);
+                    int[] arrDatasetIds = lstDatasetMap.Select(i => i.datasetid).ToArray();
+                    var result = (from i in _dbContext.images
+                                  join iu in _dbContext.imagedrbyusers on i.imagename equals iu.imagename
+                                  join u in _dbContext.users on iu.userid equals u.id
+                                  where arrDatasetIds.Contains(i.datasetid)
+                                  where iu.markedforreview == MarkedForReview.requested
+                                  orderby iu.id
+                                  select new
+                                  {
+                                      predictionid = iu.id,
+                                      imageid = i.id,
+                                      imagename = iu.imagename,
+                                      datasetid = i.datasetid,
+                                      kaggle_sushrut_drmatched = iu.kaggle_sushrut_drmatched,
+                                      drlevel_byuser = iu.drlevel_byuser,
+                                      subdiseaseids = iu.subdiseaseids,
+                                      userid = iu.userid,
+                                      username = u.username,
+                                      supedadmin = u.admin,
+                                      createdon = iu.createdon,
+                                      modifiedon = iu.modifiedon,
+                                      regionannotation = iu.regionannotation,
+                                      markedforreview = iu.markedforreview
+                                  }).ToList();
+
+                    return Ok(new
+                    {
+                        success = 1,
+                        data = dr == DRStatus.All ? result : result.Where(r => r.drlevel_byuser == dr.GetHashCode())
+                    });
+                }
+            }
+            catch (Exception)
+            {
+                return Ok(new
+                {
+                    success = default(int),
+                    message = "Exception has been detected. Please contact to the authority."
+                });
+            }
+        }
+
+        [HttpGet]
+        [ActionName("GetReviewedImages")]
+        public IActionResult GetReviewedImages([FromQuery] string datasetids,[FromQuery] DRStatus dr = DRStatus.All)
+        {
+            try
+            {
+                var claimsIdentity = this.User.Identity as ClaimsIdentity;
+                var username = claimsIdentity.FindFirst(ClaimTypes.Name)?.Value;
+                User userObj = _dbContext.users.SingleOrDefault(u => u.username == username);
+
+                if (userObj.admin)
+                {
+                    if (String.IsNullOrEmpty(datasetids))
+                    {
+                        var result = (from i in _dbContext.images
+                                      join iu in _dbContext.imagedrbyusers on i.imagename equals iu.imagename
+                                      join u in _dbContext.users on iu.userid equals u.id
+                                      where iu.markedforreview == MarkedForReview.reviewed
+                                      orderby iu.id
+                                      select new
+                                      {
+                                          predictionid = iu.id,
+                                          imageid = i.id,
+                                          imagename = iu.imagename,
+                                          datasetid = i.datasetid,
+                                          kaggle_sushrut_drmatched = iu.kaggle_sushrut_drmatched,
+                                          drlevel_byuser = iu.drlevel_byuser,
+                                          subdiseaseids = iu.subdiseaseids,
+                                          userid = iu.userid,
+                                          username = u.username,
+                                          supedadmin = u.admin,
+                                          createdon = iu.createdon,
+                                          modifiedon = iu.modifiedon,
+                                          regionannotation = iu.regionannotation,
+                                          markedforreview = iu.markedforreview
+                                      }).ToList();
+
+                        return Ok(new
+                        {
+                            success = 1,
+                            data = dr == DRStatus.All ? result : result.Where(r => r.drlevel_byuser == dr.GetHashCode())
+                        });
+                    }
+                    else
+                    {
+                        string[] lstDatasetIds = datasetids.Trim().Split(',');
+                        var result = (from i in _dbContext.images
+                                      join iu in _dbContext.imagedrbyusers on i.imagename equals iu.imagename
+                                      join u in _dbContext.users on iu.userid equals u.id
+                                      where lstDatasetIds.Contains(i.datasetid.ToString())
+                                      where iu.markedforreview == MarkedForReview.reviewed
+                                      orderby iu.id
+                                      select new
+                                      {
+                                          predictionid = iu.id,
+                                          imageid = i.id,
+                                          imagename = iu.imagename,
+                                          datasetid = i.datasetid,
+                                          kaggle_sushrut_drmatched = iu.kaggle_sushrut_drmatched,
+                                          drlevel_byuser = iu.drlevel_byuser,
+                                          subdiseaseids = iu.subdiseaseids,
+                                          userid = iu.userid,
+                                          username = u.username,
+                                          supedadmin = u.admin,
+                                          createdon = iu.createdon,
+                                          modifiedon = iu.modifiedon,
+                                          regionannotation = iu.regionannotation,
+                                          markedforreview = iu.markedforreview
+                                      }).ToList();
+
+                        return Ok(new
+                        {
+                            success = 1,
+                            data = dr == DRStatus.All ? result : result.Where(r => r.drlevel_byuser == dr.GetHashCode())
+                        });
+                    }
+                }
+                else
+                {
+                    return Ok(new
+                    {
+                        success = default(int),
+                        message = "User does not have enough rights."
+                    });
+
+                    #region if we allow non-admin users to fetch images they reviewd 
+                    ////List<DatasetMap> lstDatasetMap = new BucketCalculator().GetDatasetMapping(_dbContext, userObj.id, datasetids);
+                    ////int[] arrDatasetIds = lstDatasetMap.Select(i => i.datasetid).ToArray();
+                    ////var result = (from i in _dbContext.images
+                    ////              join iu in _dbContext.imagedrbyusers on i.imagename equals iu.imagename
+                    ////              join u in _dbContext.users on iu.userid equals u.id
+                    ////              where arrDatasetIds.Contains(i.datasetid)
+                    ////              where iu.markedforreview == MarkedForReview.reviewed
+                    ////              orderby iu.id
+                    ////              select new
+                    ////              {
+                    ////                  predictionid = iu.id,
+                    ////                  imageid = i.id,
+                    ////                  imagename = iu.imagename,
+                    ////                  datasetid = i.datasetid,
+                    ////                  kaggle_sushrut_drmatched = iu.kaggle_sushrut_drmatched,
+                    ////                  drlevel_byuser = iu.drlevel_byuser,
+                    ////                  subdiseaseids = iu.subdiseaseids,
+                    ////                  userid = iu.userid,
+                    ////                  username = u.username,
+                    ////                  supedadmin = u.admin,
+                    ////                  createdon = iu.createdon,
+                    ////                  modifiedon = iu.modifiedon,
+                    ////                  regionannotation = iu.regionannotation,
+                    ////                  markedforreview = iu.markedforreview
+                    ////              }).ToList();
+
+                    ////return Ok(new
+                    ////{
+                    ////    success = 1,
+                    ////    data = dr == DRStatus.All ? result : result.Where(r => r.drlevel_byuser == dr.GetHashCode())
+                    ////}); 
+                    #endregion
+                }
+            }
+            catch (Exception)
+            {
+                return Ok(new
+                {
+                    success = default(int),
+                    message = "Exception has been detected. Please contact to the authority."
+                });
+            }
+        }
+
+        [HttpPost]
+        [ActionName("ReviewAnnotation")]
+        public IActionResult ReviewAnnotation([FromBody] UpdateAnnotationMarkedForReview updateAnnotationMarkedForReview)
+        {
+            try
+            {
+                //admin only
+                var claimsIdentity = this.User.Identity as ClaimsIdentity;
+                var username = claimsIdentity.FindFirst(ClaimTypes.Name)?.Value;
+                User userObj = _dbContext.users.SingleOrDefault(u => u.username == username);
+
+                if (!userObj.admin)
+                {
+                    return Ok(new
+                    {
+                        success = default(int),
+                        message = "User does not have enough rights."
+                    });
+                }
+
+                ImageDrByUser objImageDr = _dbContext.imagedrbyusers.Where(iu => iu.id == updateAnnotationMarkedForReview.predictionid).SingleOrDefault();
+                if (objImageDr == null)
+                {
+                    return Ok(new
+                    {
+                        success = default(int),
+                        message = "No record found for given predictionid."
+                    });
+                }
+
+                string strMessage = null;
+                switch (updateAnnotationMarkedForReview.action)
+                {
+                    case ReviewAction.Review:
+                        {
+                            //action = review
+                            //if review == null/ reviewd  =>  review = requested
+                            //if review == requested  =>  do nothing
+                            if (objImageDr.markedforreview != MarkedForReview.requested)
+                            {
+                                objImageDr.markedforreview = MarkedForReview.requested;
+                                _dbContext.SaveChanges();
+                                strMessage = "Prediction has been marked for review.";
+                            }
+                            else
+                            {
+                                strMessage = "Prediction is already marked for review.";
+                            }
+                        }
+                        break;
+                    case ReviewAction.Complete:
+                        {
+                            //action = complete
+                            //review == reviewed  =>  review = completed
+                            //review == requested  =>  do nothing
+                            if (objImageDr.markedforreview == MarkedForReview.reviewed)
+                            {
+                                objImageDr.markedforreview = MarkedForReview.completed;
+                                _dbContext.SaveChanges();
+                                strMessage = "Prediction has been marked as completed.";
+                            }
+                            else
+                            {
+                                strMessage = "Prediction is not in reviewed state.";
+                            }
+                        }
+                        break;
+                    case ReviewAction.Cancel:
+                        {
+                            //action = cancel
+                            //review = null
+                            objImageDr.markedforreview = null;
+                            _dbContext.SaveChanges();
+                            strMessage = "Review request for given prediction has been cancelled.";
+                        }
+                        break;
+                    default:
+                        {
+                            //default action = review
+                            //if review == null/ reviewd  =>  review = requested
+                            //if review == requested  =>  do nothing
+                            if (objImageDr.markedforreview != MarkedForReview.requested)
+                            {
+                                objImageDr.markedforreview = MarkedForReview.requested;
+                                _dbContext.SaveChanges();
+                                strMessage = "Prediction has been marked for review.";
+                            }
+                            else
+                            {
+                                strMessage = "Prediction is already marked for review.";
+                            }
+                        }
+                        break;
+                }
+                return Ok(new
+                {
+                    success = 1,
+                    message = strMessage
+                });
+            }
+            catch (Exception)
             {
                 return Ok(new
                 {
@@ -948,6 +1312,7 @@ namespace canonapi.Controllers
                         (!string.IsNullOrEmpty(objs.regionannotation.id) ?
                         SaveOrDeleteAnnotation(objs.regionannotation, objs.regionannotation.id) :
                         SaveOrDeleteAnnotation(objs.regionannotation));
+                    obj.markedforreview = objs.markedforreview;
 
                     var claimsIdentity = this.User.Identity as ClaimsIdentity;
                     var username = claimsIdentity.FindFirst(ClaimTypes.Name)?.Value;
@@ -988,6 +1353,10 @@ namespace canonapi.Controllers
                         //imgObj.kaggle_sushrut_drmatched = obj.kaggle_sushrut_drmatched;
                         imgObj.drlevel_byuser = obj.drlevel_byuser;
                         imgObj.subdiseaseids = obj.subdiseaseids;
+                        if (imgObj.markedforreview != null)
+                        {
+                            imgObj.markedforreview = MarkedForReview.reviewed;
+                        }
                         if (!string.IsNullOrEmpty(imgObj.regionannotation))
                         {
                             if (string.IsNullOrEmpty(obj.regionannotation))

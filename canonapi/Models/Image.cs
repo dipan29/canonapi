@@ -48,6 +48,7 @@ namespace canonapi.Models
         public bool superadmin { get; set; }
         public bool is_admin { get; set; }
         public bool is_anonymous { get; set; }
+        public string markedforreview { get; set; }
         public List<UsersPrediction> users_prediction { get; set; }
     }
 
@@ -57,6 +58,7 @@ namespace canonapi.Models
         public int userid { get; set; }
         public long predictionid { get; set; }
         public DRStatus dr_level { get; set; }
+        public string markedforreview { get; set; }
     }
 
     public class ImageOutIds
