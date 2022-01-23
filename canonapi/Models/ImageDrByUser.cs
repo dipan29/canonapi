@@ -16,6 +16,7 @@ namespace canonapi.Models
         public DateTime createdon { get; set; }
         public DateTime? modifiedon { get; set; }
         public string regionannotation { get; set; }
+        public string markedforreview { get; set; }
     }
 
     public class ImageDrByUserFinal
@@ -29,5 +30,26 @@ namespace canonapi.Models
         public DateTime createdon { get; set; }
         public DateTime? modifiedon { get; set; }
         public AnnotationObject regionannotation { get; set; }
+        public string markedforreview { get; set; }
+    }
+
+    public class UpdateAnnotationMarkedForReview
+    {
+        public int predictionid { get; set; }
+        public ReviewAction action { get; set; }
+    }
+    
+    public class MarkedForReview
+    {
+        public static string requested = "requested";
+        public static string reviewed = "reviewed";
+        public static string completed = "completed";
+    }
+
+    public enum ReviewAction
+    {
+        Review = 0,
+        Complete = 1,
+        Cancel = 2
     }
 }
