@@ -891,7 +891,7 @@ namespace canonapi.Controllers
                 obj.regionannotation = userGradedImage != null && !string.IsNullOrEmpty(userGradedImage.regionannotation) ? GetSavedAnnotationById(userGradedImage.regionannotation) : null;
                 obj.datasetid = objImage.datasetid;
                 obj.superadmin = userObj.admin;
-                obj.markedforreview = userGradedImage.markedforreview;
+                obj.markedforreview = userGradedImage != null && !string.IsNullOrEmpty(userGradedImage.markedforreview) ? userGradedImage.markedforreview : null;
                 DatasetMap dsMap = _dbContext.datasetmap.Where(ds => ds.userid == userObj.id && ds.datasetid == objImage.datasetid).FirstOrDefault();
                 obj.is_admin = dsMap.isadmin;
                 obj.is_anonymous = dsMap.isanonymous;
@@ -1052,7 +1052,7 @@ namespace canonapi.Controllers
 
         [HttpGet]
         [ActionName("GetReviewedImages")]
-        public IActionResult GetReviewedImages([FromQuery] string datasetids,[FromQuery] DRStatus dr = DRStatus.All)
+        public IActionResult GetReviewedImages([FromQuery] string datasetids, [FromQuery] DRStatus dr = DRStatus.All)
         {
             try
             {
