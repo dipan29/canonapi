@@ -196,7 +196,6 @@ C:\Users\Dipan Roy\Office\canonapi\canonapi\bin\Release\netcoreapp3.1\runtimes\w
 C:\Users\Dipan Roy\Office\canonapi\canonapi\bin\Release\netcoreapp3.1\runtimes\linux\native\libmongocrypt.so
 C:\Users\Dipan Roy\Office\canonapi\canonapi\bin\Release\netcoreapp3.1\runtimes\osx\native\libmongocrypt.dylib
 C:\Users\Dipan Roy\Office\canonapi\canonapi\bin\Release\netcoreapp3.1\runtimes\win\native\mongocrypt.dll
-C:\Users\Dipan Roy\Office\canonapi\canonapi\obj\Release\netcoreapp3.1\canonapi.csproj.AssemblyReference.cache
 C:\Users\Dipan Roy\Office\canonapi\canonapi\obj\Release\netcoreapp3.1\canonapi.GeneratedMSBuildEditorConfig.editorconfig
 C:\Users\Dipan Roy\Office\canonapi\canonapi\obj\Release\netcoreapp3.1\canonapi.AssemblyInfoInputs.cache
 C:\Users\Dipan Roy\Office\canonapi\canonapi\obj\Release\netcoreapp3.1\canonapi.AssemblyInfo.cs
