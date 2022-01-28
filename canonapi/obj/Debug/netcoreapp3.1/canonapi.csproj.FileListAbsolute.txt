@@ -283,4 +283,3 @@ C:\Source Code\canonapi\canonapi\obj\Debug\netcoreapp3.1\canonapi.csproj.CopyCom
 C:\Source Code\canonapi\canonapi\obj\Debug\netcoreapp3.1\canonapi.dll
 C:\Source Code\canonapi\canonapi\obj\Debug\netcoreapp3.1\canonapi.pdb
 C:\Source Code\canonapi\canonapi\obj\Debug\netcoreapp3.1\canonapi.genruntimeconfig.cache
-C:\Source Code\canonapi\canonapi\obj\Debug\netcoreapp3.1\canonapi.csproj.AssemblyReference.cache

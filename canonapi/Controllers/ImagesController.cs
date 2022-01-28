@@ -50,12 +50,13 @@ namespace canonapi.Controllers
                 if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.Yes)
                 {
                     counts.totalImages = _dbContext.images.Where(i => i.drlevel_kaggle == i.drlevel_sushrut && arrDatasetIds.Contains(i.datasetid)).Count();
-                    counts.totalImagesPredicted = _dbContext.imagedrbyusers.Where(i => i.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.Yes.GetHashCode() && i.userid == userObj.id).Count();
+                    //counts.totalImagesPredicted = _dbContext.imagedrbyusers.Where(i => i.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.Yes.GetHashCode() && i.userid == userObj.id).Count();
                     //Ungraded Count
                     {
                         counts.totalUngradedImages = new BucketCalculator().CalculateSpecificBucketByCondition(_dbContext,
                             DRStatus.Ungraded, KaggleAndSushrutMatchedImages.Yes, userObj.id, datasetids);
                     }
+                    counts.totalImagesPredicted = counts.totalImages - counts.totalUngradedImages;
                     //DR0 Count
                     {
                         counts.totalDR0FromPredicted = new BucketCalculator().CalculateSpecificBucketByCondition(_dbContext,
@@ -95,12 +96,13 @@ namespace canonapi.Controllers
                 else if ((KaggleAndSushrutMatchedImages)Convert.ToInt32(_configuration["KaggleAndSushrutMatchedImages"]) == KaggleAndSushrutMatchedImages.No)
                 {
                     counts.totalImages = _dbContext.images.Where(i => i.drlevel_kaggle != i.drlevel_sushrut).Count();
-                    counts.totalImagesPredicted = _dbContext.imagedrbyusers.Where(i => i.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.No.GetHashCode()).Count();
+                    //counts.totalImagesPredicted = _dbContext.imagedrbyusers.Where(i => i.kaggle_sushrut_drmatched == KaggleAndSushrutMatchedImages.No.GetHashCode()).Count();
                     //Ungraded Count
                     {
                         counts.totalUngradedImages = new BucketCalculator().CalculateSpecificBucketByCondition(_dbContext,
                             DRStatus.Ungraded, KaggleAndSushrutMatchedImages.No, userObj.id, datasetids);
                     }
+                    counts.totalImagesPredicted = counts.totalImages - counts.totalUngradedImages;
                     //DR0 Count
                     {
                         counts.totalDR0FromPredicted = new BucketCalculator().CalculateSpecificBucketByCondition(_dbContext,
@@ -905,7 +907,7 @@ namespace canonapi.Controllers
                                             select new UsersPrediction()
                                             {
                                                 userid = iu.userid,
-                                                username = u.username,
+                                                username = u.firstname + " " + u.lastname, //u.username,
                                                 predictionid = iu.id,
                                                 dr_level = (DRStatus)iu.drlevel_byuser,
                                                 markedforreview = iu.markedforreview

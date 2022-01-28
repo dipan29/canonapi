@@ -28,5 +28,6 @@ namespace canonapi.Models
         public string adminid { get; set; }
         public bool isadmin { get; set; }
         public bool isanonymous { get; set; }
+        public int totalimages { get; set; }
     }
 }

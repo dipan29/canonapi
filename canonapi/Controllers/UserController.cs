@@ -258,7 +258,7 @@ namespace canonapi.Controllers
 
         [HttpGet]
         [ActionName("GetDatasetForUser")]
-        public IActionResult GetDatasetForUser([FromQuery] string username = null)
+        public IActionResult GetDatasetForUser([FromQuery] string username)
         {
             try
             {
@@ -266,67 +266,29 @@ namespace canonapi.Controllers
                 var currentUsername = claimsIdentity.FindFirst(ClaimTypes.Name)?.Value;
                 User userObj = _dbContext.users.SingleOrDefault(u => u.username == currentUsername);
 
-                List<DatasetsForUser> lstOut = new List<DatasetsForUser>();
+                //List<DatasetsForUser> lstOut = new List<DatasetsForUser>();
+
+                DatasetsForUser lstout;
 
                 if (String.IsNullOrEmpty(username))
                 {
-                    if (userObj.admin)
+                    return Ok(new
                     {
-                        foreach (User user in _dbContext.users.ToList())
-                        {
-                            DatasetsForUser datasetsForUser = new DatasetsForUser();
-                            datasetsForUser.user = user;
-                            datasetsForUser.lstMappedDatasets = (from dm in _dbContext.datasetmap
-                                                                 join d in _dbContext.datasets on dm.datasetid equals d.id
-                                                                 where dm.userid == datasetsForUser.user.id
-                                                                 orderby dm.id
-                                                                 select new MappedDatasets()
-                                                                 {
-                                                                     datasetid = d.id,
-                                                                     datasetname = d.datasetname,
-                                                                     description = d.description,
-                                                                     attribute = d.attribute,
-                                                                     referenceid = d.referenceid,
-                                                                     adminid = d.adminid,
-                                                                     isadmin = dm.isadmin,
-                                                                     isanonymous = dm.isanonymous
-                                                                 }).ToList();
-                            lstOut.Add(datasetsForUser);
-                        }
-                    }
-                    else
-                    {
-                        DatasetsForUser datasetsForUser = new DatasetsForUser();
-                        datasetsForUser.user = userObj;
-                        datasetsForUser.lstMappedDatasets = (from dm in _dbContext.datasetmap
-                                                             join d in _dbContext.datasets on dm.datasetid equals d.id
-                                                             where dm.userid == datasetsForUser.user.id
-                                                             orderby dm.id
-                                                             select new MappedDatasets()
-                                                             {
-                                                                 datasetid = d.id,
-                                                                 datasetname = d.datasetname,
-                                                                 description = d.description,
-                                                                 attribute = d.attribute,
-                                                                 referenceid = d.referenceid,
-                                                                 adminid = d.adminid,
-                                                                 isadmin = dm.isadmin,
-                                                                 isanonymous = dm.isanonymous
-                                                             }).ToList();
-                        lstOut.Add(datasetsForUser);
-                    }
+                        success = default(int),
+                        message = "Username cannot be empty"
+                    });
                 }
                 else
                 {
                     if (userObj.admin || username == currentUsername)
                     {
-                        DatasetsForUser datasetsForUser = new DatasetsForUser();
-                        datasetsForUser.user = _dbContext.users.SingleOrDefault(u => u.username == username);
-                        if (datasetsForUser.user != null)
+                        lstout = new DatasetsForUser();
+                        lstout.user = _dbContext.users.SingleOrDefault(u => u.username == username);
+                        if (lstout.user != null)
                         {
-                            datasetsForUser.lstMappedDatasets = (from dm in _dbContext.datasetmap
+                            lstout.lstMappedDatasets = (from dm in _dbContext.datasetmap
                                                                  join d in _dbContext.datasets on dm.datasetid equals d.id
-                                                                 where dm.userid == datasetsForUser.user.id
+                                                                 where dm.userid == lstout.user.id
                                                                  orderby dm.id
                                                                  select new MappedDatasets()
                                                                  {
@@ -340,7 +302,11 @@ namespace canonapi.Controllers
                                                                      isanonymous = dm.isanonymous
                                                                  }).ToList();
                         }
-                        lstOut.Add(datasetsForUser);
+                        foreach(MappedDatasets mappedDataset in lstout.lstMappedDatasets)
+                        {
+                            mappedDataset.totalimages = _dbContext.images.Where(i => i.datasetid == mappedDataset.datasetid).Count();
+                        }
+                        //lstOut.Add(datasetsForUser);
                     }
                     else
                     {
@@ -351,10 +317,97 @@ namespace canonapi.Controllers
                         });
                     }
                 }
+                #region Nested Structure
+
+                ////if (String.IsNullOrEmpty(username))
+                ////{
+                ////    if (userObj.admin)
+                ////    {
+                ////        foreach (User user in _dbContext.users.ToList())
+                ////        {
+                ////            DatasetsForUser datasetsForUser = new DatasetsForUser();
+                ////            datasetsForUser.user = user;
+                ////            datasetsForUser.lstMappedDatasets = (from dm in _dbContext.datasetmap
+                ////                                                 join d in _dbContext.datasets on dm.datasetid equals d.id
+                ////                                                 where dm.userid == datasetsForUser.user.id
+                ////                                                 orderby dm.id
+                ////                                                 select new MappedDatasets()
+                ////                                                 {
+                ////                                                     datasetid = d.id,
+                ////                                                     datasetname = d.datasetname,
+                ////                                                     description = d.description,
+                ////                                                     attribute = d.attribute,
+                ////                                                     referenceid = d.referenceid,
+                ////                                                     adminid = d.adminid,
+                ////                                                     isadmin = dm.isadmin,
+                ////                                                     isanonymous = dm.isanonymous
+                ////                                                 }).ToList();
+                ////            lstOut.Add(datasetsForUser);
+                ////        }
+                ////    }
+                ////    else
+                ////    {
+                ////        DatasetsForUser datasetsForUser = new DatasetsForUser();
+                ////        datasetsForUser.user = userObj;
+                ////        datasetsForUser.lstMappedDatasets = (from dm in _dbContext.datasetmap
+                ////                                             join d in _dbContext.datasets on dm.datasetid equals d.id
+                ////                                             where dm.userid == datasetsForUser.user.id
+                ////                                             orderby dm.id
+                ////                                             select new MappedDatasets()
+                ////                                             {
+                ////                                                 datasetid = d.id,
+                ////                                                 datasetname = d.datasetname,
+                ////                                                 description = d.description,
+                ////                                                 attribute = d.attribute,
+                ////                                                 referenceid = d.referenceid,
+                ////                                                 adminid = d.adminid,
+                ////                                                 isadmin = dm.isadmin,
+                ////                                                 isanonymous = dm.isanonymous
+                ////                                             }).ToList();
+                ////        lstOut.Add(datasetsForUser);
+                ////    }
+                ////}
+                ////else
+                ////{
+                ////    if (userObj.admin || username == currentUsername)
+                ////    {
+                ////        DatasetsForUser datasetsForUser = new DatasetsForUser();
+                ////        datasetsForUser.user = _dbContext.users.SingleOrDefault(u => u.username == username);
+                ////        if (datasetsForUser.user != null)
+                ////        {
+                ////            datasetsForUser.lstMappedDatasets = (from dm in _dbContext.datasetmap
+                ////                                                 join d in _dbContext.datasets on dm.datasetid equals d.id
+                ////                                                 where dm.userid == datasetsForUser.user.id
+                ////                                                 orderby dm.id
+                ////                                                 select new MappedDatasets()
+                ////                                                 {
+                ////                                                     datasetid = d.id,
+                ////                                                     datasetname = d.datasetname,
+                ////                                                     description = d.description,
+                ////                                                     attribute = d.attribute,
+                ////                                                     referenceid = d.referenceid,
+                ////                                                     adminid = d.adminid,
+                ////                                                     isadmin = dm.isadmin,
+                ////                                                     isanonymous = dm.isanonymous
+                ////                                                 }).ToList();
+                ////        }
+                ////        lstOut.Add(datasetsForUser);
+                ////    }
+                ////    else
+                ////    {
+                ////        return Ok(new
+                ////        {
+                ////            success = default(int),
+                ////            message = "User does not have enough rights"
+                ////        });
+                ////    }
+                ////}
+
+                #endregion
                 return Ok(new
                 {
                     success = 1,
-                    data = lstOut
+                    data = lstout
                 });
 
                 #region Commented
