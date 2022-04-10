@@ -37,7 +37,7 @@ namespace canonapi.Controllers
                 {
                     result.Add(new Disease()
                     {
-                        diseaseid = DRStatus.DR0.GetHashCode(),
+                        diseaseid = Fruits.Apples.GetHashCode(),
                         diseasename = "DR0",
                         subdiseaseid = default(int),
                         subdieseasename = string.Empty

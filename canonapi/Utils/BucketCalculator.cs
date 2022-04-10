@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 public class BucketCalculator
 {
-    public int CalculateSpecificBucketByCondition(ApplicationDbContext _dbContext, DRStatus dr, KaggleAndSushrutMatchedImages matchingscope, int userid, string datasetids = null)
+    public int CalculateSpecificBucketByCondition(ApplicationDbContext _dbContext, Fruits dr, KaggleAndSushrutMatchedImages matchingscope, int userid, string datasetids = null)
     {
         try
         {
@@ -16,7 +16,7 @@ public class BucketCalculator
 
             int totalDRx = default(int);
 
-            if (dr == DRStatus.Ungraded)
+            if (dr == Fruits.Ungraded)
             {
                 switch (matchingscope)
                 {
@@ -170,7 +170,7 @@ public class BucketCalculator
         }
     }
 
-    public int CalculateSpecificBucketByPredictionSourceCondition(ApplicationDbContext _dbContext, DRStatus dr, KaggleAndSushrutMatchedImages matchingscope, int userid, DataSource source = DataSource.Both, string datasetids = null)
+    public int CalculateSpecificBucketByPredictionSourceCondition(ApplicationDbContext _dbContext, Fruits dr, KaggleAndSushrutMatchedImages matchingscope, int userid, DataSource source = DataSource.Both, string datasetids = null)
     {
         int totalDRx = default(int);
         try
@@ -178,7 +178,7 @@ public class BucketCalculator
             List<DatasetMap> lstDatasetMap = GetDatasetMapping(_dbContext, userid, datasetids);
             int[] arrDatasetIds = lstDatasetMap.Select(i => i.datasetid).ToArray();
 
-            if (dr == DRStatus.Ungraded)
+            if (dr == Fruits.Ungraded)
             {
                 switch (matchingscope)
                 {
@@ -392,7 +392,7 @@ public class BucketCalculator
         }
     }
 
-    public IEnumerable<long> GetAllIdsForSpecificBucketByPredictionSourceCondition(ApplicationDbContext _dbContext, DRStatus dr, KaggleAndSushrutMatchedImages matchingscope, int userid, DataSource source = DataSource.Both, string datasetids = null)
+    public IEnumerable<long> GetAllIdsForSpecificBucketByPredictionSourceCondition(ApplicationDbContext _dbContext, Fruits dr, KaggleAndSushrutMatchedImages matchingscope, int userid, DataSource source = DataSource.Both, string datasetids = null)
     {
         IEnumerable<long> DRxIds = new List<long>();
         try
@@ -400,7 +400,7 @@ public class BucketCalculator
             List<DatasetMap> lstDatasetMap = GetDatasetMapping(_dbContext, userid, datasetids);
             int[] arrDatasetIds = lstDatasetMap.Select(i => i.datasetid).ToArray();
 
-            if (dr == DRStatus.Ungraded)
+            if (dr == Fruits.Ungraded)
             {
                 switch (matchingscope)
                 {

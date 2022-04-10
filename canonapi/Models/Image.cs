@@ -25,9 +25,9 @@ namespace canonapi.Models
     public class ImageOut
     {
         public long id { get; set; }
-        public DRStatus drlevel_kaggle { get; set; }
-        public DRStatus drlevel_sushrut { get; set; }
-        public DRStatus drlevel_byuser { get; set; }
+        public Fruits drlevel_kaggle { get; set; }
+        public Fruits drlevel_sushrut { get; set; }
+        public Fruits drlevel_byuser { get; set; }
         public IEnumerable<int> subdiseaseids { get; set; }
         public string thumbnail { get; set; }
         public string image { get; set; }
@@ -37,9 +37,9 @@ namespace canonapi.Models
     {
         public long id { get; set; }
         public string imagename { get; set; }
-        public DRStatus drlevel_kaggle { get; set; }
-        public DRStatus drlevel_sushrut { get; set; }
-        public DRStatus drlevel_byuser { get; set; }
+        public Fruits drlevel_kaggle { get; set; }
+        public Fruits drlevel_sushrut { get; set; }
+        public Fruits drlevel_byuser { get; set; }
         public IEnumerable<int> subdiseaseids { get; set; }
         public string thumbnail { get; set; }
         public string image { get; set; }
@@ -57,7 +57,7 @@ namespace canonapi.Models
         public string username { get; set; }
         public int userid { get; set; }
         public long predictionid { get; set; }
-        public DRStatus dr_level { get; set; }
+        public Fruits dr_level { get; set; }
         public string markedforreview { get; set; }
     }
 
@@ -71,11 +71,11 @@ namespace canonapi.Models
         public long totalImages { get; set; }
         public long totalImagesPredicted { get; set; }
         public long totalUngradedImages { get; set; }
-        public long totalDR0FromPredicted { get; set; }
-        public long totalDR1FromPredicted { get; set; }
-        public long totalDR2FromPredicted { get; set; }
-        public long totalDR3FromPredicted { get; set; }
-        public long totalDR4FromPredicted { get; set; }
+        public long totalApplesFromPredicted { get; set; }
+        public long totalOrangesFromPredicted { get; set; }
+        public long totalMangosFromPredicted { get; set; }
+        public long totalGrapesFromPredicted { get; set; }
+        public long totalBananasFromPredicted { get; set; }
         public long totalOthersFromPredicted { get; set; }
         public long totalUngradableImages { get; set; }
     }
@@ -84,16 +84,16 @@ namespace canonapi.Models
     {
         public decimal Kaggle_Ungraded { get; set; }
         public decimal Sushrut_Ungraded { get; set; }
-        public decimal Kaggle_DR0 { get; set; }
-        public decimal Sushrut_DR0 { get; set; }
-        public decimal Kaggle_DR1 { get; set; }
-        public decimal Sushrut_DR1 { get; set; }
-        public decimal Kaggle_DR2 { get; set; }
-        public decimal Sushrut_DR2 { get; set; }
-        public decimal Kaggle_DR3 { get; set; }
-        public decimal Sushrut_DR3 { get; set; }
-        public decimal Kaggle_DR4 { get; set; }
-        public decimal Sushrut_DR4 { get; set; }
+        public decimal Kaggle_Apples { get; set; }
+        public decimal Sushrut_Apples { get; set; }
+        public decimal Kaggle_Oranges { get; set; }
+        public decimal Sushrut_Oranges { get; set; }
+        public decimal Kaggle_Mangos { get; set; }
+        public decimal Sushrut_Mangos { get; set; }
+        public decimal Kaggle_Grapes { get; set; }
+        public decimal Sushrut_Grapes { get; set; }
+        public decimal Kaggle_Bananas { get; set; }
+        public decimal Sushrut_Bananas { get; set; }
         public decimal Kaggle_Others { get; set; }
         public decimal Sushrut_Others { get; set; }
         public decimal Kaggle_Ungradable { get; set; }
@@ -106,15 +106,15 @@ namespace canonapi.Models
         public IEnumerable<CountMaster> counts { get; set; }
     }
 
-    public enum DRStatus
+    public enum Fruits
     {
         All = -1,//-2,
         //Ungraded = -1,
-        DR0 = 0,
-        DR1 = 1,
-        DR2 = 2,
-        DR3 = 3,
-        DR4 = 4,
+        Apples = 0,
+        Oranges = 1,
+        Mangos = 2,
+        Grapes = 3,
+        Bananas = 4,
         Others = 5,
         Ungradable = 6,
         Ungraded = 7
