@@ -897,21 +897,29 @@ namespace canonapi.Controllers
                 DatasetMap dsMap = _dbContext.datasetmap.Where(ds => ds.userid == userObj.id && ds.datasetid == objImage.datasetid).FirstOrDefault();
                 obj.is_admin = dsMap.isadmin;
                 obj.is_anonymous = dsMap.isanonymous;
-                if (obj.superadmin || obj.is_admin)
+                if(obj.is_anonymous)
                 {
-                    obj.users_prediction = (from iu in _dbContext.imagedrbyusers
-                                            join u in _dbContext.users on iu.userid equals u.id
-                                            where iu.imagename == objImage.imagename
-                                            where iu.userid != userObj.id
-                                            orderby iu.id
-                                            select new UsersPrediction()
-                                            {
-                                                userid = iu.userid,
-                                                username = u.firstname + " " + u.lastname, //u.username,
-                                                predictionid = iu.id,
-                                                dr_level = (DRStatus)iu.drlevel_byuser,
-                                                markedforreview = iu.markedforreview
-                                            }).ToList();
+                    obj.drlevel_kaggle = DRStatus.Ungraded;
+                    obj.drlevel_sushrut = DRStatus.Ungraded;
+                }
+                else
+                {
+                    if (obj.superadmin || obj.is_admin)
+                    {
+                        obj.users_prediction = (from iu in _dbContext.imagedrbyusers
+                                                join u in _dbContext.users on iu.userid equals u.id
+                                                where iu.imagename == objImage.imagename
+                                                where iu.userid != userObj.id
+                                                orderby iu.id
+                                                select new UsersPrediction()
+                                                {
+                                                    userid = iu.userid,
+                                                    username = u.firstname + " " + u.lastname, //u.username,
+                                                    predictionid = iu.id,
+                                                    dr_level = (DRStatus)iu.drlevel_byuser,
+                                                    markedforreview = iu.markedforreview
+                                                }).ToList();
+                    }
                 }
 
                 return Ok(new

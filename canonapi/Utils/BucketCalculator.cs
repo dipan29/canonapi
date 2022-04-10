@@ -65,10 +65,12 @@ public class BucketCalculator
             else
             {
                 List<string> AllowedImages = _dbContext.images.Where(i => arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
+                int[] arrDatasetsNotAnonymous = _dbContext.datasetmap.Where(d => d.isanonymous == false && d.userid == userid).Select(d => d.id).ToArray();
                 if (matchingscope == KaggleAndSushrutMatchedImages.Yes)
                 {
                     IEnumerable<string> sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle == i.drlevel_sushrut
-                                && i.drlevel_sushrut == dr.GetHashCode() && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
+                                //&& i.drlevel_sushrut == dr.GetHashCode() && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
+                                && i.drlevel_sushrut == dr.GetHashCode() && arrDatasetsNotAnonymous.Contains(i.datasetid)).Select(i => i.imagename).ToList();
                     ///////////////////////////////
                     List<string> sourceDRxImagesCopy = new List<string>();
                     sourceDRxImagesCopy.AddRange(sourceDRxImages);
@@ -100,7 +102,8 @@ public class BucketCalculator
                 {
                     IEnumerable<string> sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle != i.drlevel_sushrut
                                 && (i.drlevel_sushrut == dr.GetHashCode() || i.drlevel_kaggle == dr.GetHashCode())
-                                && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
+                                //&& arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
+                                && arrDatasetsNotAnonymous.Contains(i.datasetid)).Select(i => i.imagename).ToList();
                     ///////////////////////////////
                     List<string> sourceDRxImagesCopy = new List<string>();
                     sourceDRxImagesCopy.AddRange(sourceDRxImages);
@@ -131,7 +134,8 @@ public class BucketCalculator
                 else
                 {
                     IEnumerable<string> sourceDRxImages = _dbContext.images.Where(i => i.drlevel_sushrut == dr.GetHashCode()
-                    || i.drlevel_kaggle == dr.GetHashCode() && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
+                    //|| i.drlevel_kaggle == dr.GetHashCode() && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
+                    || i.drlevel_kaggle == dr.GetHashCode() && arrDatasetsNotAnonymous.Contains(i.datasetid)).Select(i => i.imagename).ToList();
                     ///////////////////////////////
                     List<string> sourceDRxImagesCopy = new List<string>();
                     sourceDRxImagesCopy.AddRange(sourceDRxImages);
@@ -226,6 +230,7 @@ public class BucketCalculator
             else
             {
                 List<string> AllowedImages = _dbContext.images.Where(i => arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
+                int[] arrDatasetsNotAnonymous = _dbContext.datasetmap.Where(d => d.isanonymous == false && d.userid == userid).Select(d => d.id).ToArray();
                 if (matchingscope == KaggleAndSushrutMatchedImages.Yes)
                 {
                     IEnumerable<string> sourceDRxImages = new List<string>();
@@ -234,19 +239,19 @@ public class BucketCalculator
                         case DataSource.Kaggle:
                             {
                                 sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle == i.drlevel_sushrut
-                                && i.drlevel_kaggle == dr.GetHashCode() && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
+                                && i.drlevel_kaggle == dr.GetHashCode() && arrDatasetsNotAnonymous.Contains(i.datasetid)).Select(i => i.imagename).ToList();
                                 break;
                             }
                         case DataSource.Sushrut:
                             {
                                 sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle == i.drlevel_sushrut
-                                && i.drlevel_sushrut == dr.GetHashCode() && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
+                                && i.drlevel_sushrut == dr.GetHashCode() && arrDatasetsNotAnonymous.Contains(i.datasetid)).Select(i => i.imagename).ToList();
                                 break;
                             }
                         default:
                             {
                                 sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle == i.drlevel_sushrut
-                                && i.drlevel_sushrut == dr.GetHashCode() && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
+                                && i.drlevel_sushrut == dr.GetHashCode() && arrDatasetsNotAnonymous.Contains(i.datasetid)).Select(i => i.imagename).ToList();
                                 break;
                             }
                     }
@@ -285,20 +290,20 @@ public class BucketCalculator
                         case DataSource.Kaggle:
                             {
                                 sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle != i.drlevel_sushrut
-                                && i.drlevel_kaggle == dr.GetHashCode() && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
+                                && i.drlevel_kaggle == dr.GetHashCode() && arrDatasetsNotAnonymous.Contains(i.datasetid)).Select(i => i.imagename).ToList();
                                 break;
                             }
                         case DataSource.Sushrut:
                             {
                                 sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle != i.drlevel_sushrut
-                                && i.drlevel_sushrut == dr.GetHashCode() && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
+                                && i.drlevel_sushrut == dr.GetHashCode() && arrDatasetsNotAnonymous.Contains(i.datasetid)).Select(i => i.imagename).ToList();
                                 break;
                             }
                         default:
                             {
                                 sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle != i.drlevel_sushrut
                                 && (i.drlevel_sushrut == dr.GetHashCode() || i.drlevel_kaggle == dr.GetHashCode())
-                                && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
+                                && arrDatasetsNotAnonymous.Contains(i.datasetid)).Select(i => i.imagename).ToList();
                                 break;
                             }
                     }
@@ -337,19 +342,19 @@ public class BucketCalculator
                         case DataSource.Kaggle:
                             {
                                 sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle == dr.GetHashCode()
-                                && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
+                                && arrDatasetsNotAnonymous.Contains(i.datasetid)).Select(i => i.imagename).ToList();
                                 break;
                             }
                         case DataSource.Sushrut:
                             {
                                 sourceDRxImages = _dbContext.images.Where(i => i.drlevel_sushrut == dr.GetHashCode()
-                                && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
+                                && arrDatasetsNotAnonymous.Contains(i.datasetid)).Select(i => i.imagename).ToList();
                                 break;
                             }
                         default:
                             {
                                 sourceDRxImages = _dbContext.images.Where(i => i.drlevel_sushrut == dr.GetHashCode()
-                                || i.drlevel_kaggle == dr.GetHashCode() && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
+                                || i.drlevel_kaggle == dr.GetHashCode() && arrDatasetsNotAnonymous.Contains(i.datasetid)).Select(i => i.imagename).ToList();
                                 break;
                             }
                     }
@@ -447,6 +452,7 @@ public class BucketCalculator
             else
             {
                 List<string> AllowedImages = _dbContext.images.Where(i => arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
+                int[] arrDatasetsNotAnonymous = _dbContext.datasetmap.Where(d => d.isanonymous == false && d.userid == userid).Select(d => d.id).ToArray();
                 if (matchingscope == KaggleAndSushrutMatchedImages.Yes)
                 {
                     IEnumerable<string> sourceDRxImages = new List<string>();
@@ -455,19 +461,19 @@ public class BucketCalculator
                         case DataSource.Kaggle:
                             {
                                 sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle == i.drlevel_sushrut
-                                && i.drlevel_kaggle == dr.GetHashCode() && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
+                                && i.drlevel_kaggle == dr.GetHashCode() && arrDatasetsNotAnonymous.Contains(i.datasetid)).Select(i => i.imagename).ToList();
                                 break;
                             }
                         case DataSource.Sushrut:
                             {
                                 sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle == i.drlevel_sushrut
-                                && i.drlevel_sushrut == dr.GetHashCode() && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
+                                && i.drlevel_sushrut == dr.GetHashCode() && arrDatasetsNotAnonymous.Contains(i.datasetid)).Select(i => i.imagename).ToList();
                                 break;
                             }
                         default:
                             {
                                 sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle == i.drlevel_sushrut
-                                && i.drlevel_sushrut == dr.GetHashCode() && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
+                                && i.drlevel_sushrut == dr.GetHashCode() && arrDatasetsNotAnonymous.Contains(i.datasetid)).Select(i => i.imagename).ToList();
                                 break;
                             }
                     }
@@ -523,20 +529,20 @@ public class BucketCalculator
                         case DataSource.Kaggle:
                             {
                                 sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle != i.drlevel_sushrut
-                                && i.drlevel_kaggle == dr.GetHashCode() && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
+                                && i.drlevel_kaggle == dr.GetHashCode() && arrDatasetsNotAnonymous.Contains(i.datasetid)).Select(i => i.imagename).ToList();
                                 break;
                             }
                         case DataSource.Sushrut:
                             {
                                 sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle != i.drlevel_sushrut
-                                && i.drlevel_sushrut == dr.GetHashCode() && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
+                                && i.drlevel_sushrut == dr.GetHashCode() && arrDatasetsNotAnonymous.Contains(i.datasetid)).Select(i => i.imagename).ToList();
                                 break;
                             }
                         default:
                             {
                                 sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle != i.drlevel_sushrut
                                 && (i.drlevel_sushrut == dr.GetHashCode() || i.drlevel_kaggle == dr.GetHashCode())
-                                && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
+                                && arrDatasetsNotAnonymous.Contains(i.datasetid)).Select(i => i.imagename).ToList();
                                 break;
                             }
                     }
@@ -592,19 +598,19 @@ public class BucketCalculator
                         case DataSource.Kaggle:
                             {
                                 sourceDRxImages = _dbContext.images.Where(i => i.drlevel_kaggle == dr.GetHashCode()
-                                && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
+                                && arrDatasetsNotAnonymous.Contains(i.datasetid)).Select(i => i.imagename).ToList();
                                 break;
                             }
                         case DataSource.Sushrut:
                             {
                                 sourceDRxImages = _dbContext.images.Where(i => i.drlevel_sushrut == dr.GetHashCode()
-                                && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
+                                && arrDatasetsNotAnonymous.Contains(i.datasetid)).Select(i => i.imagename).ToList();
                                 break;
                             }
                         default:
                             {
                                 sourceDRxImages = _dbContext.images.Where(i => i.drlevel_sushrut == dr.GetHashCode()
-                                || i.drlevel_kaggle == dr.GetHashCode() && arrDatasetIds.Contains(i.datasetid)).Select(i => i.imagename).ToList();
+                                || i.drlevel_kaggle == dr.GetHashCode() && arrDatasetsNotAnonymous.Contains(i.datasetid)).Select(i => i.imagename).ToList();
                                 break;
                             }
                     }

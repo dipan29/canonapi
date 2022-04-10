@@ -1,28 +1,21 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Source Code\\canonapi\\canonapi\\canonapi.csproj": {}
+    "C:\\Artelus\\DRC\\canonapi\\canonapi\\canonapi.csproj": {}
   },
   "projects": {
-    "C:\\Source Code\\canonapi\\canonapi\\canonapi.csproj": {
+    "C:\\Artelus\\DRC\\canonapi\\canonapi\\canonapi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Source Code\\canonapi\\canonapi\\canonapi.csproj",
+        "projectUniqueName": "C:\\Artelus\\DRC\\canonapi\\canonapi\\canonapi.csproj",
         "projectName": "canonapi",
-        "projectPath": "C:\\Source Code\\canonapi\\canonapi\\canonapi.csproj",
-        "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
-        "outputPath": "C:\\Source Code\\canonapi\\canonapi\\obj\\",
+        "projectPath": "C:\\Artelus\\DRC\\canonapi\\canonapi\\canonapi.csproj",
+        "packagesPath": "C:\\Users\\subha\\.nuget\\packages\\",
+        "outputPath": "C:\\Artelus\\DRC\\canonapi\\canonapi\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
-          "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\",
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-        ],
         "configFilePaths": [
-          "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
+          "C:\\Users\\subha\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "netcoreapp3.1"
@@ -104,7 +97,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.404\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.406\\RuntimeIdentifierGraph.json"
         }
       }
     }
