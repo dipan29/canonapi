@@ -54,6 +54,8 @@ namespace canonapi.Controllers
                     signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
                     );
 
+                SessionController.createSession(_dbContext ,userObj.id, new JwtSecurityTokenHandler().WriteToken(token));
+
                 return Ok(new
                 {
                     token = new JwtSecurityTokenHandler().WriteToken(token),

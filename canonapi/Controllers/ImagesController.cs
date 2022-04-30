@@ -922,6 +922,9 @@ namespace canonapi.Controllers
                     }
                 }
 
+                string sessionkey = Request.Headers["Authorization"].ToString().Split()[1];
+                SessionController.updateSession(_dbContext, sessionkey);
+
                 return Ok(new
                 {
                     success = 1,
@@ -1400,6 +1403,8 @@ namespace canonapi.Controllers
                         _dbContext.imagedrbyusers.Add(obj);
                         _dbContext.SaveChanges();
                     }
+                    string sessionkey = Request.Headers["Authorization"].ToString().Split()[1];
+                    SessionController.updateSession(_dbContext, sessionkey);
 
                     return Ok(new
                     {

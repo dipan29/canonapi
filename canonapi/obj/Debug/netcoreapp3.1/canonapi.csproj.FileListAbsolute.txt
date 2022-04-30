@@ -344,7 +344,6 @@ C:\Artelus\DRC\canonapi\canonapi\bin\Debug\netcoreapp3.1\runtimes\win\native\sna
 C:\Artelus\DRC\canonapi\canonapi\bin\Debug\netcoreapp3.1\runtimes\linux\native\libmongocrypt.so
 C:\Artelus\DRC\canonapi\canonapi\bin\Debug\netcoreapp3.1\runtimes\osx\native\libmongocrypt.dylib
 C:\Artelus\DRC\canonapi\canonapi\bin\Debug\netcoreapp3.1\runtimes\win\native\mongocrypt.dll
-C:\Artelus\DRC\canonapi\canonapi\obj\Debug\netcoreapp3.1\canonapi.csproj.AssemblyReference.cache
 C:\Artelus\DRC\canonapi\canonapi\obj\Debug\netcoreapp3.1\canonapi.GeneratedMSBuildEditorConfig.editorconfig
 C:\Artelus\DRC\canonapi\canonapi\obj\Debug\netcoreapp3.1\canonapi.AssemblyInfoInputs.cache
 C:\Artelus\DRC\canonapi\canonapi\obj\Debug\netcoreapp3.1\canonapi.AssemblyInfo.cs
@@ -352,8 +351,6 @@ C:\Artelus\DRC\canonapi\canonapi\obj\Debug\netcoreapp3.1\canonapi.csproj.CoreCom
 C:\Artelus\DRC\canonapi\canonapi\obj\Debug\netcoreapp3.1\canonapi.MvcApplicationPartsAssemblyInfo.cs
 C:\Artelus\DRC\canonapi\canonapi\obj\Debug\netcoreapp3.1\canonapi.MvcApplicationPartsAssemblyInfo.cache
 C:\Artelus\DRC\canonapi\canonapi\obj\Debug\netcoreapp3.1\staticwebassets\canonapi.StaticWebAssets.Manifest.cache
-C:\Artelus\DRC\canonapi\canonapi\obj\Debug\netcoreapp3.1\staticwebassets\canonapi.StaticWebAssets.xml
-C:\Artelus\DRC\canonapi\canonapi\obj\Debug\netcoreapp3.1\scopedcss\bundle\canonapi.styles.css
 C:\Artelus\DRC\canonapi\canonapi\obj\Debug\netcoreapp3.1\canonapi.RazorTargetAssemblyInfo.cache
 C:\Artelus\DRC\canonapi\canonapi\obj\Debug\netcoreapp3.1\canonapi.csproj.CopyComplete
 C:\Artelus\DRC\canonapi\canonapi\obj\Debug\netcoreapp3.1\canonapi.dll
